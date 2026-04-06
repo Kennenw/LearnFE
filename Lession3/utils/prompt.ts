@@ -44,7 +44,7 @@ export function writeNumberCheck(str: string, variable?: string, start?: number,
                 continue;
             else return number;
         } else {
-            console.log(`Không được nhập chữ cái vào ${variable}`);
+            console.log(`Không được nhập chữ cái vào ${variable ?? "ô nhập"}`);
             continue;
         }
     }
