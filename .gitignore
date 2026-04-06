@@ -1,0 +1,80 @@
+# ====================================================================
+# KIỂM SOÁT THƯ MỤC CÔNG VIỆC (NODE_MODULES & BUILDS)
+# ====================================================================
+
+# Loại bỏ tất cả node_modules ở mọi cấp độ thư mục
+**/node_modules/
+**/jspm_packages/
+
+# Loại bỏ các thư mục build/output của JS, TS, React, Next.js, Vue
+**/dist/
+**/build/
+**/out/
+**/.next/
+**/.vuepress/dist/
+**/.serverless/
+**/bin/
+**/obj/
+
+# TypeScript: Loại bỏ file bộ nhớ đệm và file JS tự sinh (nếu có)
+**/*.tsbuildinfo
+# Nếu bạn không muốn push file .js sinh ra từ .ts (cẩn thận khi dùng)
+# **/*.js
+# **/*.js.map
+
+# ====================================================================
+# BẢO MẬT (QUAN TRỌNG NHẤT)
+# ====================================================================
+
+# Loại bỏ tất cả các file .env ở mọi thư mục con
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/*.env.bak
+
+# KHÔNG ignore file .env ví dụ để đồng đội biết cấu trúc config
+!**/.env.example
+
+# ====================================================================
+# LOGS & TEST
+# ====================================================================
+
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+**/coverage/
+**/.nyc_output/
+**/.stryker-tmp/
+
+# ====================================================================
+# CẤU HÌNH IDE & HỆ ĐIỀU HÀNH
+# ====================================================================
+
+# Editor (VS Code, WebStorm, Sublime)
+**/.vscode/*
+!**/.vscode/extensions.json
+**/.idea/
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.sw?
+
+# OS rác
+**/.DS_Store
+**/Thumbs.db
+
+# ====================================================================
+# CÁC CÔNG CỤ KHÁC
+# ====================================================================
+
+**/.cache/
+**/.parcel-cache/
+**/.turbo/
+**/.eslintcache
+**/.stylelintcache
