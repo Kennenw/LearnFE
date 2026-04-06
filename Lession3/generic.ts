@@ -37,7 +37,9 @@ export class Generic<T> {
         let index = this.value.findIndex((x: any) => x.id === id);
         if (index === -1)
             console.log("Không tìm thấy để xóa");
-        else
+        else {
+            this.value.splice(index, 1);
             console.log("Xóa thành công");
+        }
     }
 }
