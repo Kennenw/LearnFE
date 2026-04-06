@@ -19,9 +19,9 @@
 # TypeScript: Loại bỏ file bộ nhớ đệm và file JS tự sinh (nếu có)
 **/*.tsbuildinfo
 # Nếu bạn không muốn push file .js sinh ra từ .ts (cẩn thận khi dùng)
-# **/*.js
-# **/*.js.map
-
+**/*.js
+**/*.js.map
+!lession/*.js
 # ====================================================================
 # BẢO MẬT (QUAN TRỌNG NHẤT)
 # ====================================================================
