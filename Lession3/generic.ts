@@ -12,16 +12,16 @@ export class Generic<T> {
 
     getById(id: number, name?: string): T | undefined {
         let item = this.value.find((e: any) => e.id === id);
-        if (typeof item === "undefined"){
-            console.log(`Không tìm thấy ${name} với ID ${id}`);
+        if (typeof item === "undefined") {
+            console.log(`Không tìm thấy ${name ? name : ""} với ID ${id}`);
             return undefined;
         }
         else return item;
     }
 
     edit(entity: T, value: Partial<T>): void {
-        for(const key in value){
-            if(value[key] !== undefined && value[key] !== ""){
+        for (const key in value) {
+            if (value[key] !== undefined && value[key] !== "") {
                 entity[key] = value[key];
             }
         }

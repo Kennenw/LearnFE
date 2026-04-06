@@ -11,10 +11,10 @@ export const listCategorys: Category[] = [
 ];
 
 export const listBooks: Book[] = [
-    new Book(1, "JavaScript cơ bản", "Nguyễn Văn A", listCategorys[0], "NXB Trẻ", "2020"),
-    new Book(2, "React nâng cao", "Trần Văn B", listCategorys[0], "NXB Thanh Niên", "2022"),
-    new Book(3, "Kinh tế vi mô", "Lê Văn C", listCategorys[1], "NXB Giáo Dục", "2019"),
-    new Book(4, "Dế Mèn phiêu lưu ký", "Tô Hoài", listCategorys[2], "NXB Kim Đồng", "2015")
+    new Book(1, "JavaScript cơ bản", "Nguyễn Văn A", listCategorys[0], "NXB Trẻ", "2020", 22),
+    new Book(2, "React nâng cao", "Trần Văn B", listCategorys[0], "NXB Thanh Niên", "2022", 12),
+    new Book(3, "Kinh tế vi mô", "Lê Văn C", listCategorys[1], "NXB Giáo Dục", "2019", 23),
+    new Book(4, "Dế Mèn phiêu lưu ký", "Tô Hoài", listCategorys[2], "NXB Kim Đồng", "2015", 45)
 ];
 
 export const listMembers: Member[] = [

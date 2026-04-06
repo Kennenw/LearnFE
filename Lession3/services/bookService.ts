@@ -19,10 +19,11 @@ export class BookService {
         const authorName = writeCheck("Nhập tác giả: ", "Tác giả");
         const publisher = writeCheck("Nhập nhà xuất bản: ", "NXB");
         const publicationYear = writeCheck("Nhập năm xuất bản: ", "Năm");
+        const quanlity = writeNumberCheck("Nhập số lượng sách: ", "Số lượng sách");
         const categoryID = writeNumberCheck("Nhập ID loại sách: ", "Loại sách");
         const categoryItem = this.genericCateogry.getById(categoryID, "loại sách");
         if (categoryItem !== undefined) {
-            this.genericBook.add(new Book(id, title, authorName, categoryItem, publisher, publicationYear));
+            this.genericBook.add(new Book(id, title, authorName, categoryItem, publisher, publicationYear, quanlity));
         }
     }
 
@@ -50,16 +51,18 @@ export class BookService {
             const authorName = write("Nhập tác giả: ");
             const publisher = write("Nhập nhà xuất bản: ");
             const publicationYear = write("Nhập năm xuất bản: ");
+            const quanlity = writeNumber("Nhập năm số lượng: ");
             const categoryID = writeNumber("Nhập ID loại sách: ");
             const newItemEdit: Partial<Book> = {
                 title: title,
                 authorName: authorName,
                 publisher: publisher,
-                publicationYear: publicationYear
+                publicationYear: publicationYear,
+                quanlity: quanlity
             }
             if (categoryID !== -1) {
                 const categoryItem = this.genericCateogry.getById(categoryID, "loại sách");
-                if (categoryItem !== undefined) 
+                if (categoryItem !== undefined)
                     newItemEdit.category = categoryItem;
                 else return;
             }

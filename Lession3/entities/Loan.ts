@@ -27,25 +27,17 @@ export class Loan {
         this.check = false;
     }
 
-    giveBack() : void{
+    giveBack(): void {
         this.returnDate = new Date();
         this.check = true;
     }
 
-    borrowTime(numberDay : number): void{
+    borrowTime(numberDay: number): void {
         const now = new Date();
         this.dueDate.setDate(now.getDate() + numberDay);
     }
 
     display(): string {
-        return `Mã phiếu mượn: ${this.id}
-                Thành viên: [${this.member.id}] - ${this.member.fullName}
-                Sách: [${this.copy.id}] - ${this.copy.title}
-                SL: ${this.quanlity}
-                Ngày mượn: ${this.borrowDate.toDateString()}
-                Ngày trả theo hẹn: ${this.dueDate.toDateString()}
-                Ngày trả thực sự: ${this.returnDate?.toDateString()}
-                Trạng thái: ${this.check ? "Đã trả" : "Chưa trả"}
-                `;
+        return `Mã phiếu mượn: ${this.id}| Thành viên: [${this.member.id}] - ${this.member.fullName}| Sách: [${this.copy.id}] - ${this.copy.title}| SL: ${this.quanlity}| Ngày mượn: ${this.borrowDate.toDateString()}| Ngày trả theo hẹn: ${this.dueDate.toDateString()}| Ngày trả thực sự: ${this.returnDate?.toDateString()}| Trạng thái: ${this.check ? "Đã trả" : "Chưa trả"}`;
     }
 }

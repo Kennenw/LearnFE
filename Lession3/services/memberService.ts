@@ -30,6 +30,15 @@ export class MemberService {
         }
     }
 
+    unBanMember(): void {
+        const id = writeNumberCheck("Nhập ID thành viên đã bị ban: ", "ID thành viên");
+        const member = this.generic.get().find(m => m.id === id && m.accountStatus === AccountStatus.Locking);
+        if (member !== undefined) {
+            member.accountStatus = AccountStatus.Active;
+            console.log("UnBan thành viên thành công");
+        }
+    }
+
     getAllMember(): void {
         let list = this.generic.get();
         if (list.length)
@@ -49,14 +58,14 @@ export class MemberService {
                 fullName: name,
                 phone: phone,
             }
-            if(type !== -1){
+            if (type !== -1) {
                 newMemberEdit.memberType = (type === 1 ? MemberType.Student : MemberType.Teacher);
             }
             this.generic.edit(member, newMemberEdit);
         }
     }
 
-    removeMember(): void{
+    removeMember(): void {
         const id = writeNumberCheck("Nhập ID thành viên cần xóa: ", "ID thành viên");
         this.generic.remove(id)
     }

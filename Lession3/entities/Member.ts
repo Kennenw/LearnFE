@@ -22,10 +22,6 @@ export class Member {
     }
 
     display(): string {
-        return `Thành viên [${this.id}]
-                Họ tên: ${this.fullName}
-                Số điện thoại: ${this.phone}
-                Loại thành viên: ${this.memberType}
-                Trạng thái: ${this.accountStatus}`;
+        return `Thành viên [${this.id}]| Họ tên: ${this.fullName}| Số điện thoại: ${this.phone}| Loại thành viên: ${this.memberType}| Trạng thái: ${this.accountStatus}`;
     }
 }

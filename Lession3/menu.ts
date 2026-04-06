@@ -1,3 +1,4 @@
+import { listLoans } from './data';
 import { BookService } from "./services/bookService";
 import { CategoryService } from "./services/categoryService";
 import { writeNumberCheck } from "./utils/prompt";
@@ -26,20 +27,20 @@ export class Menu {
                             2. Xem loại sách
                             3. Sửa loại sách
                             4. Xóa loại sách
-
                             5. Tạo sách
                             6. Xem sách
                             7. Sửa sách
                             8. Xóa sách
-
                             9. Tạo thành viên
                             10. Xem thành viên
                             11. Sửa thành viên
                             12. Khóa thành viên
-                            13. Xóa thành viên
-
-                            14. Mượn sách
-
+                            13. Bỏ khóa thành viên
+                            14. Xóa thành viên
+                            15. Mượn sách
+                            16. Trả sách
+                            17. Lịch sử mượn
+                            18. Lịch sử mượn theo người dùng
                             0. Thoát`);
             choose = writeNumberCheck("Nhập hành động: ", "Lựa chọn");
             switch (choose) {
@@ -82,10 +83,22 @@ export class Menu {
                     this.memberService.banMember();
                     break;
                 case 13:
-                    this.memberService.removeMember();
+                    this.memberService.unBanMember();
                     break;
                 case 14:
+                    this.memberService.removeMember();
+                    break;
+                case 15:
                     this.loanService.borrowBook();
+                    break;
+                case 16:
+                    this.loanService.giveBackBook();
+                    break;
+                case 17:
+                    this.loanService.getAllLoan();
+                    break;
+                case 18:
+                    this.loanService.getLoanByMemberID();
                     break;
                 default:
                     console.log("Lỗi");

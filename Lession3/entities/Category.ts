@@ -8,6 +8,6 @@ export class Category{
     }
     
     display(): string{
-        return `ID: ${this.id} | Loại ${this.name}`;
+        return `ID: ${this.id}| Loại: ${this.name}`;
     }
 }

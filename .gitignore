@@ -21,7 +21,8 @@
 # Nếu bạn không muốn push file .js sinh ra từ .ts (cẩn thận khi dùng)
 **/*.js
 **/*.js.map
-!lession/*.js
+!lession1/
+!lession1/*.js
 # ====================================================================
 # BẢO MẬT (QUAN TRỌNG NHẤT)
 # ====================================================================
