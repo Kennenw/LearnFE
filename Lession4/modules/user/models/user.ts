@@ -1,21 +1,21 @@
-import { Role, UserStatus } from "../types/user";
+import { Role, UserStatus } from "../../../core/enum/user";
+import BaseEntity from "../../../core/base/base-entity";
 
-export default class User {
-    id: number;
+export default class User extends BaseEntity {
     userName: string;
     password: string;
     role: Role;
     status: UserStatus;
 
-    constructor(id:number, userName: string, password: string){
-        this.id = id;
+    constructor(userName: string, password: string) {
+        super();
         this.userName = userName;
         this.password = password;
         this.role = Role.Customer;
         this.status = UserStatus.Active;
     }
 
-    setRole(role: Role){
+    setRole(role: Role) {
         this.role = role;
     }
 }

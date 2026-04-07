@@ -1,13 +1,13 @@
-import { IPagination } from "../types/common";
+import { PaginationResult } from "../types/common";
 
 export function Pagination<T>(data: T[],
-    totalItems: number,
+    totalItems: number | null,
     pageSize: number,
-    pageIndex: number): IPagination<T> {
+    pageIndex: number): PaginationResult<T> {
 
-    const totalPage = Math.ceil(totalItems / pageSize);
+    const totalPage = Math.ceil(totalItems ?? 0 / pageSize);
     const pagedData = data.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
-    
+
     return {
         data: pagedData,
         totalPage,

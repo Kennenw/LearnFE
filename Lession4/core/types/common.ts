@@ -1,7 +1,7 @@
-export interface IPagination<T>{
+export interface PaginationResult<T>{
     data: T[];
-    totalPage: number;
-    totalItems: number;
+    totalPage: number | 1;
+    totalItems: number | null;
     pageIndex: number;
     pageSize: number;
     hasPreviousPage(): boolean;

@@ -1,17 +1,17 @@
-import { OrderStatus } from "../types/order";
+import { OrderStatus } from "../../../core/enum/order";
+import BaseEntity from "../../../core/base/base-entity";
 
-export default class Order{
-    id: number;
-    customerId: number;
+export default class Order extends BaseEntity {
+    customerId: string;
     orderDate: Date;
     totalAmount: number;
     totalPrice: number;
     status: OrderStatus;
     shippingAddress: string;
-    constructor(id: number, customerId: number, totalAmount: number,
+    constructor(customerId: string, totalAmount: number,
         totalPrice: number, status: OrderStatus, shippingAddress: string, 
     ) {
-        this.id = id;
+        super();
         this.customerId = customerId;
         this.orderDate = new Date();
         this.totalAmount = totalAmount;

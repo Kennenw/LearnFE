@@ -1,15 +1,15 @@
-import { Size } from "../types/product-variant";
+import { Size } from "../../../core/enum/product-variant";
+import BaseEntity from "../../../core/base/base-entity";
 
-export default class ProductVariant {
-    id: number;
-    productId: number;
+export default class ProductVariant extends BaseEntity {
+    productId: string;
     size: Size;
     color: string;
     price: number;
     stockQuantity: number;
-    constructor(id: number, productId: number, size: Size, color: string,
+    constructor(productId: string, size: Size, color: string,
         price: number, stockQuantity: number) {
-        this.id = id;
+        super();
         this.productId = productId;
         this.size = size;
         this.color = color;
