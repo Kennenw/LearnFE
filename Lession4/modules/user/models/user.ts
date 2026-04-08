@@ -14,8 +14,4 @@ export default class User extends BaseEntity {
         this.role = Role.Customer;
         this.status = UserStatus.Active;
     }
-
-    setRole(role: Role) {
-        this.role = role;
-    }
 }

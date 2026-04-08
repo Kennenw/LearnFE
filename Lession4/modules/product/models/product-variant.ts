@@ -16,15 +16,15 @@ export default class ProductVariant extends BaseEntity {
         this.price = price;
         this.stockQuantity = stockQuantity;
     }
-    
+
     decreaseStock(stockQuantity: number): void | Error {
-        if(stockQuantity <= 0) throw new Error("Số lượng phải lớn hơn 0");
-        if(this.stockQuantity < stockQuantity) throw new Error("Không đủ số lượng");
+        if (stockQuantity <= 0) throw new Error("Số lượng phải lớn hơn 0");
+        if (this.stockQuantity < stockQuantity) throw new Error("Không đủ số lượng");
         this.stockQuantity -= stockQuantity;
     }
 
     increaseStock(stockQuantity: number): void | Error {
-        if(stockQuantity <= 0) throw new Error("Số lượng phải lớn hơn 0");
+        if (stockQuantity <= 0) throw new Error("Số lượng phải lớn hơn 0");
         this.stockQuantity += stockQuantity;
     }
 
