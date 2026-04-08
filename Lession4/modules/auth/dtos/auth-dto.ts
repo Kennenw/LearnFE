@@ -5,8 +5,10 @@ export interface LoginDTO {
     password: string
 }
 
-export interface LoginResponseDTO{
-    role: Role;
+export interface LoginResponseDTO {
+    id: string,
+    userName: string,
+    role: Role
 }
 
 export interface RegisterDTO {

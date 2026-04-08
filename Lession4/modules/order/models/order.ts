@@ -7,13 +7,13 @@ export default class Order extends BaseEntity {
     totalAmount: number;
     totalPrice: number;
     status: OrderStatus;
-    shippingAddress: string;
-    constructor(customerId: string, totalAmount: number,
-        totalPrice: number, status: OrderStatus, shippingAddress: string, 
+    shippingAddress: string | undefined;
+    constructor(customerId: string, totalAmount: number, orderDate: Date,
+        totalPrice: number, status: OrderStatus, shippingAddress?: string,
     ) {
         super();
         this.customerId = customerId;
-        this.orderDate = new Date();
+        this.orderDate = orderDate;
         this.totalAmount = totalAmount;
         this.totalPrice = totalPrice
         this.status = status;

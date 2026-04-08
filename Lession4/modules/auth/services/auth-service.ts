@@ -20,7 +20,7 @@ export default class AuthService implements IAuthService {
         if (user.password !== value.password) {
             return Promise.reject(Error('Đăng nhập thất bại'));
         }
-        return { role: user.role };
+        return { id: user.id, userName: user.userName, role: user.role };
     }
 
     async register(value: RegisterDTO): Promise<boolean> {
