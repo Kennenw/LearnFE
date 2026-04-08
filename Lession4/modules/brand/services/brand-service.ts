@@ -1,14 +1,13 @@
 import Brand from '../models/brand'
-import GenericRepository from '../../../core/base/generic-repository';
 import { BrandCreateDTO, BrandUpdateDTO, BrandViewDTO, toBrandViewDTO } from '../dtos/brand-dto';
 import { PaginationResult } from '../../../core/types/common';
-import { Pagination } from '../../../core/types/pagination';
 import { IBrandService } from './ibrand-service';
 import IGenericRepository from '../../../core/interfaces/igeneric-repository';
+import { Pagination } from '../../../core/utils/pagination';
 
 export class BrandService implements IBrandService {
     private brandRepo: IGenericRepository<Brand>;
-    constructor(brandRepo: GenericRepository<Brand>) {
+    constructor(brandRepo: IGenericRepository<Brand>) {
         this.brandRepo = brandRepo;
     }
 
