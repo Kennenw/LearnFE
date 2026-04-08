@@ -1,6 +1,6 @@
 export interface PaginationResult<T>{
     data: T[];
-    totalPage: number | 1;
+    totalPage: number;
     totalItems: number | null;
     pageIndex: number;
     pageSize: number;

@@ -1,8 +1,21 @@
-export interface CategoryViewDTO{
+import Category from "../models/category";
+
+export interface CategoryViewDTO extends Category{
     
 }
 
 export interface CategoryCreateDTO{
     name: string;
     parentId?: string;
+}
+
+export interface CategoryUpdateDTO extends Partial<Category>{
+}
+
+export function toCategoryViewDTO(category: Category): CategoryViewDTO{
+    return {
+        id: category.id,
+        name: category.name,
+        parentId: category.parentId
+    }
 }
