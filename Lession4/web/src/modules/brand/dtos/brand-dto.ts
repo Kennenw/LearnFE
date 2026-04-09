@@ -16,6 +16,7 @@ export interface BrandViewDTO {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BrandPaginationQuery extends PaginationQuery {
+    
 }
 
 export function toBrandViewDTO(brand?: Brand): BrandViewDTO {

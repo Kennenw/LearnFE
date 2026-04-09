@@ -7,6 +7,7 @@ export function useBrand() {
     const [pagination, setPagination] = useState<PaginationResult<BrandViewDTO> | null>(null);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
+    const [pageIndex, setPageIndex] = useState(1);
     const pageSize = 10;
 
     const fetchData = useCallback(async () => {
@@ -15,7 +16,7 @@ export function useBrand() {
 
             const res = await BrandController.getBrands({
                 search,
-                pageIndex: pagination?.pageIndex ?? 1,
+                pageIndex,
                 pageSize
             });
 
@@ -26,22 +27,23 @@ export function useBrand() {
         } finally {
             setLoading(false);
         }
-    }, [search, pagination?.pageIndex]);
+    }, [pageIndex, search]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    const setPageIndex = (page: number) => {
-        if (!pagination) return;
-
-        setPagination({
-            ...pagination,
-            pageIndex: page
-        });
+    const setPage = (page: number) => {
+        if (page < 1) return;
+        setPageIndex(page);
     };
 
-    const createBrand = async (payload: { name: string }) => {
+    const handleSearch = (val: string) => {
+        setSearch(val);
+        setPageIndex(1);
+    }
+
+    const createBrand = async (payload: { name: string, description: string }) => {
         try {
             setLoading(true);
             await BrandController.createBrand(payload);
@@ -76,8 +78,8 @@ export function useBrand() {
         pagination,
         loading,
         search,
-        setSearch,
-        setPageIndex,
+        setSearch: handleSearch,
+        setPageIndex: setPage,
         createBrand,
         updateBrand,
         deleteBrand,
