@@ -13,13 +13,13 @@ export class BrandService implements IBrandService {
 
     async createAsync(value: BrandCreateDTO): Promise<string> {
         await this.brandRepo.addAsync(new Brand(value.name));
-        return "Tạo hãng thành công";
+        return "Brand created successfully";
     }
 
     async updateAsync(value: BrandUpdateDTO): Promise<string> {
         await this.brandRepo.getByIdAsync(value.id);
         await this.brandRepo.editAsync(value.id, { name: value.name });
-        return "Cập nhật hãng thành công";
+        return "Brand updated successfully";
     }
 
     async getAsync(query: BrandPaginationQuery): Promise<PaginationResult<BrandViewDTO>> {
@@ -35,13 +35,13 @@ export class BrandService implements IBrandService {
 
     async getByIdAsync(id: string): Promise<BrandViewDTO> {
         const brand = await this.brandRepo.getByIdAsync(id);
-        if (!brand) return Promise.reject(Error('Hãng không tồn tại'));
+        if (!brand) return Promise.reject(Error('Brand not found'));
         return toBrandViewDTO(brand);
     }
 
     async deleteAsync(id: string): Promise<string> {
         await this.brandRepo.getByIdAsync(id);
         await this.brandRepo.removeAsync(id);
-        return "Xóa hãng thành công";
+        return "Brand deleted successfully";
     }
 }

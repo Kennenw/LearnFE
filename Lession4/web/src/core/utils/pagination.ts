@@ -10,8 +10,8 @@ export function Pagination<T>(data: T[],
     if (pageIndex === undefined || pageIndex <= 0) {
         pageIndex = 1;
     }
-    const totalPage = Math.ceil(totalItems ?? 0 / pageSize);
-    const pagedData = data.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
+    const totalPage = Math.ceil((totalItems ?? 0) / pageSize);
+    const pagedData = data;
 
     return {
         data: pagedData,
