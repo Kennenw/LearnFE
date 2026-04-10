@@ -30,18 +30,18 @@ export function useBrand() {
     }, [pageIndex, search]);
 
     const fetchAllData = useCallback(async () => {
-            try {
-                setLoading(true);
-    
-                const res = await BrandController.getBrands({});
-                setAllData(res);
-    
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        }, []);
+        try {
+            setLoading(true);
+
+            const res = await BrandController.getBrands({});
+            setAllData(res);
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         fetchData();
@@ -51,6 +51,11 @@ export function useBrand() {
     const setPage = (page: number) => {
         if (page < 1) return;
         setPageIndex(page);
+    };
+
+    const handleSearch = (value: string) => {
+        setSearch(value);
+        setPageIndex(1);
     };
 
     const createBrand = async (payload: BrandCreateDTO) => {

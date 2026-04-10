@@ -14,14 +14,12 @@ export function useProduct() {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-
             const res = await ProductController.getProducts({
                 search,
                 pageIndex: pagination?.pageIndex ?? 1,
                 pageSize
             });
             setPagination(res);
-
         } catch (err) {
             console.error(err);
         } finally {
@@ -35,7 +33,6 @@ export function useProduct() {
 
     const setPageIndex = (page: number) => {
         if (!pagination) return;
-
         setPagination({
             ...pagination,
             pageIndex: page
@@ -52,7 +49,7 @@ export function useProduct() {
         }
     };
 
-    const fetchProductDetail = async (id: string) => {
+    const fetchProductDetail = useCallback(async (id: string) => {
         try {
             setLoading(true);
             const product = await ProductController.getProductId(id);
@@ -60,7 +57,7 @@ export function useProduct() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     const updateProduct = async (payload: ProductUpdateApplicationDTO) => {
         try {

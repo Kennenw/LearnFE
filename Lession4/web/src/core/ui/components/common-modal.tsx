@@ -36,7 +36,6 @@ export default function CommonModal({
         if (!modalRef.current) return;
 
         if (show) {
-            // Thêm class show thủ công
             modalRef.current.classList.add("show");
             modalRef.current.style.display = "block";
             document.body.classList.add("modal-open");
@@ -55,11 +54,13 @@ export default function CommonModal({
 
     if (!show) return null;
 
+    const variantClass = saveVariant === "primary" ? "btn-modern-primary" : `btn-${saveVariant}`;
+
     return (
         <>
             <div 
                 className="modal-backdrop fade show" 
-                style={{ zIndex: 1040 }}
+                style={{ zIndex: 1040, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)" }}
                 onClick={backdrop !== "static" ? onHide : undefined}
             />
 
@@ -75,35 +76,35 @@ export default function CommonModal({
                     role="document"
                     onClick={(e) => e.stopPropagation()}   
                 >
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">{title}</h5>
+                    <div className="modal-content border-0 shadow-lg" style={{ borderRadius: "var(--radius-lg)" }}>
+                        <div className="modal-header border-bottom border-light px-4">
+                            <h5 className="modal-title fw-bold text-dark">{title}</h5>
                             <button 
                                 type="button" 
-                                className="btn-close" 
+                                className="btn-close shadow-none" 
                                 onClick={onHide}
                                 disabled={loading}
                             />
                         </div>
 
-                        <div className="modal-body">
+                        <div className="modal-body p-4">
                             {children}
                         </div>
 
-                        <div className="modal-footer">
+                        <div className="modal-footer border-top-0 px-4 pb-4">
                             <button 
                                 type="button" 
-                                className="btn btn-secondary" 
+                                className="btn-modern btn-modern-outline py-2 px-4 shadow-none" 
                                 onClick={onHide}
                                 disabled={loading}
                             >
-                                Hủy
+                                Cancel
                             </button>
 
                             {showSaveButton && onSave && (
                                 <button 
                                     type="button" 
-                                    className={`btn btn-${saveVariant}`}
+                                    className={`btn-modern ${variantClass} py-2 px-4 shadow-sm border-0`}
                                     onClick={onSave}
                                     disabled={loading}
                                 >

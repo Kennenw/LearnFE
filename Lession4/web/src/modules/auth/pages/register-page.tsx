@@ -4,17 +4,21 @@ import { RegisterDTO } from "../dtos/auth-dto";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
-    const { register, loading } = useAuth();
+    const { register, loading, status } = useAuth();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState<RegisterDTO>({
         userName: "",
-        password: ""
+        password: "",
+        confirmPassword: ""
     });
 
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+
+    if (status) {
+        navigate("/");
+        return null;
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -26,124 +30,101 @@ export default function RegisterPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-
-        if (!formData.userName || !formData.password) {
-            setError("Vui lòng nhập đầy đủ thông tin!");
+        if (!formData.userName || !formData.password || !formData.confirmPassword) {
+            setError("All fields are required!");
             return;
         }
-
-        if (formData.password !== confirmPassword) {
-            setError("Mật khẩu xác nhận không khớp!");
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match!");
             return;
         }
-
-        if (formData.password.length < 2) {
-            setError("Mật khẩu phải có ít nhất 2 ký tự!");
-            return;
-        }
-
         try {
             await register(formData);
-            setSuccess(true);
-
-            setTimeout(() => {
-                navigate("/login");
-            }, 2000);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setError(err.message || "Đăng ký thất bại! Vui lòng thử lại.");
+            setError(err.message || "Registration failed!");
         }
     };
 
-    if (success) {
-        return (
-            <div className="container mt-5">
-                <div className="row justify-content-center">
-                    <div className="col-md-6">
-                        <div className="alert alert-success text-center">
-                            <h4>Đăng ký thành công!</h4>
-                            <p>Đang chuyển hướng đến trang đăng nhập...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="container">
-            <div className="row justify-content-center mt-5">
-                <div className="col-md-6 col-lg-4">
-                    <div className="card shadow">
-                        <div className="card-body p-4">
-                            <h2 className="text-center mb-4">Đăng ký tài khoản</h2>
+        <div className="vh-100 d-flex align-items-center justify-content-center bg-light">
+            <div className="col-11 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                <div className="text-center mb-4">
+                    <div className="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: "60px", height: "60px" }}>
+                        <i className="bi bi-person-plus-fill fs-3"></i>
+                    </div>
+                    <h2 className="fw-bold">Create Account</h2>
+                    <p className="text-muted">Join ModernStore and start shopping today.</p>
+                </div>
 
-                            {error && (
-                                <div className="alert alert-danger">{error}</div>
-                            )}
+                <div className="card-modern shadow-lg p-4 border-0">
+                    {error && (
+                        <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger small py-2">
+                            <i className="bi bi-exclamation-circle me-2"></i>{error}
+                        </div>
+                    )}
 
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3 d-flex flex-column align-items-start">
-                                    <label className="form-label">Tên đăng nhập</label>
-                                    <input
-                                        type="text"
-                                        name="userName"
-                                        className="form-control"
-                                        value={formData.userName}
-                                        onChange={handleChange}
-                                        placeholder="Nhập tên đăng nhập"
-                                        required
-                                    />
-                                </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label className="form-label small fw-bold text-muted text-uppercase mb-2">Username</label>
+                            <input
+                                type="text"
+                                name="userName"
+                                className="form-control form-control-modern"
+                                value={formData.userName}
+                                onChange={handleChange}
+                                placeholder="Choose a username"
+                                required
+                            />
+                        </div>
 
-                                <div className="mb-3 d-flex flex-column align-items-start">
-                                    <label className="form-label">Mật khẩu</label>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        className="form-control"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        placeholder="Nhập mật khẩu"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="mb-3 d-flex flex-column align-items-start">
-                                    <label className="form-label ">Xác nhận mật khẩu</label>
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        placeholder="Nhập lại mật khẩu"
-                                        required
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="btn btn-success w-100 mb-3"
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="spinner-border spinner-border-sm me-2" />
-                                            Đang đăng ký...
-                                        </>
-                                    ) : "Đăng ký"}
-                                </button>
-                            </form>
-
-                            <div className="text-center">
-                                <p>
-                                    Đã có tài khoản?{" "}
-                                    <Link to="/login" className="text-decoration-none">
-                                        Đăng nhập
-                                    </Link>
-                                </p>
+                        <div className="row mb-4">
+                            <div className="col-6">
+                                <label className="form-label small fw-bold text-muted text-uppercase mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    className="form-control form-control-modern"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+                            <div className="col-6">
+                                <label className="form-label small fw-bold text-muted text-uppercase mb-2">Confirm</label>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    className="form-control form-control-modern"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    placeholder="••••••••"
+                                    required
+                                />
                             </div>
                         </div>
+
+                        <button
+                            type="submit"
+                            className="btn-modern btn-modern-primary w-100 justify-content-center py-2 shadow-sm"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" />
+                                    Creating account...
+                                </>
+                            ) : "Register Now"}
+                        </button>
+                    </form>
+
+                    <div className="text-center mt-4 pt-2 border-top">
+                        <p className="text-muted small mb-0">
+                            Already have an account?{" "}
+                            <Link to="/login" className="text-primary fw-bold text-decoration-none">
+                                Sign In
+                            </Link>
+                        </p>
                     </div>
                 </div>
             </div>

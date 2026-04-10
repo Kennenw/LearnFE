@@ -1,141 +1,93 @@
-import { useState } from "react";
 import { useProduct } from "../hooks/use-product";
 import { Link } from "react-router-dom";
 import { ProductStatus } from "@core/enum/product";
-import CommonModal from "@core/ui/components/common-modal";
 
 export default function ProductManagerPage() {
-    const {
-        data,
-        pagination,
-        loading,
-        search,
-        setSearch,
-        setPageIndex,
-        deleteProduct,
-        reload,
-    } = useProduct();
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deletingId, setDeletingId] = useState<string>("");
-    const [deletingName, setDeletingName] = useState<string>("");
-
-    const openDeleteConfirm = (id: string, name: string) => {
-        setDeletingId(id);
-        setDeletingName(name);
-        setShowDeleteModal(true);
-    };
-
-    const handleDelete = async () => {
-        if (!deletingId) return;
-        await deleteProduct(deletingId);
-        setShowDeleteModal(false);
-    };
+    const { data, pagination, loading, search, setSearch, setPageIndex, deleteProduct, reload } = useProduct();
+    const handleDelete = async (id: string, name: string) => { if (window.confirm(`Archive product "${name}"?`)) await deleteProduct(id); };
 
     return (
-        <div className="container mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Quản lý Sản phẩm</h2>
-                <Link to="/products/create" className="btn btn-success">
-                    + Thêm sản phẩm mới
-                </Link>
-            </div>
-
-            <div className="row mb-3">
-                <div className="col-md-6">
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Tìm kiếm sản phẩm..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+        <div className="container-fluid px-0">
+            <header className="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 className="fw-bold mb-1">Catalog Manager</h2>
+                    <p className="text-muted small mb-0">Directly control your cross-platform item collection</p>
                 </div>
-                <div className="col-md-6 text-end">
-                    <button className="btn btn-outline-secondary" onClick={reload}>
-                        ↻ Tải lại
-                    </button>
+                <div className="d-flex gap-2">
+                    <button className="btn btn-modern btn-modern-outline" onClick={reload}><i className="bi bi-arrow-clockwise"></i></button>
+                    <Link to="/products/create" className="btn btn-modern btn-modern-primary px-4 text-decoration-none">
+                        <i className="bi bi-plus-lg me-2"></i> Register Item
+                    </Link>
                 </div>
-            </div>
+            </header>
 
-            <div className="table-responsive">
-                <table className="table table-striped table-hover">
-                    <thead className="table-dark">
-                        <tr>
-                            <th>Tên sản phẩm</th>
-                            <th>Danh mục</th>
-                            <th>Thương hiệu</th>
-                            <th>Trạng thái</th>
-                            <th className="text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading && data.length === 0 ? (
-                            <tr><td colSpan={5} className="text-center py-4"><div className="spinner-border" /></td></tr>
-                        ) : data.length === 0 ? (
-                            <tr><td colSpan={5} className="text-center py-4 text-muted">Không có sản phẩm nào</td></tr>
-                        ) : (
-                            data.map((product) => (
-                                <tr key={product.id}>
-                                    <td>{product.name}</td>
-                                    <td>{product.categoryName}</td>
-                                    <td>{product.brandName}</td>
+            <div className="card-modern border-0 shadow-sm overflow-hidden mt-4">
+                 <div className="p-4 bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <div className="col-md-5">
+                         <div className="input-group overflow-hidden border rounded-3 bg-light bg-opacity-50 ps-3">
+                            <span className="input-group-text bg-transparent border-0 pe-1 text-muted"><i className="bi bi-search"></i></span>
+                            <input type="text" className="form-control border-0 bg-transparent shadow-none py-2" placeholder="Scan SKU or Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="table-responsive">
+                    <table className="table table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th className="px-4">Product Detail</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th className="text-center">Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data.map((p) => (
+                                <tr key={p.id}>
+                                    <td className="px-4">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <div className="bg-light rounded-3 d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
+                                                <i className="bi bi-box-seam text-muted opacity-50"></i>
+                                            </div>
+                                            <div>
+                                                <div className="fw-bold text-dark">{p.name}</div>
+                                                <div className="small text-muted line-clamp-1" style={{ maxWidth: '280px' }}>{p.description || "No description provided."}</div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
-                                        <span className={`badge ${product.status === ProductStatus.ACTIVE ? 'bg-success' : 'bg-secondary'}`}>
-                                            {product.status}
+                                        <div className="d-flex flex-column">
+                                            <span className="fw-bold small text-dark">{p.categoryName}</span>
+                                            <span className="text-muted" style={{ fontSize: '11px' }}>{p.brandName}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className={`badge rounded-pill px-3 py-1 ${p.status === ProductStatus.ACTIVE ? 'bg-success bg-opacity-10 text-success' : 'bg-slate-200 text-slate-500'} small fw-bold`}>
+                                            {p.status}
                                         </span>
                                     </td>
-                                    <td className="text-center">
-                                        <Link to={`/products/${product.id}`} className="btn btn-sm btn-info me-2">
-                                            Chi tiết
-                                        </Link>
-                                        <Link to={`/products/edit/${product.id}`} className="btn btn-sm btn-warning me-2">
-                                            Sửa
-                                        </Link>
-                                        <button
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => openDeleteConfirm(product.id, product.name)}
-                                        >
-                                            Xóa
-                                        </button>
+                                    <td className="text-center text-nowrap">
+                                        <Link to={`/products/edit/${p.id}`} className="btn btn-link text-decoration-none small fw-bold me-2">Modify</Link>
+                                        <Link to={`/products/${p.id}`} className="btn btn-link text-decoration-none small fw-bold text-muted me-2">Inspect</Link>
+                                        <button className="btn btn-link text-danger text-decoration-none small fw-bold" onClick={() => handleDelete(p.id, p.name)}>Archive</button>
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {pagination && pagination.totalPage > 1 && (
+                    <div className="p-4 border-top d-flex justify-content-between align-items-center bg-light bg-opacity-10">
+                        <span className="small text-muted fw-bold">Item batch {pagination.pageIndex} / {pagination.totalPage}</span>
+                        <div className="d-flex gap-2">
+                             <button className="btn btn-modern btn-modern-outline btn-sm py-1 px-3" disabled={pagination.pageIndex === 1} onClick={() => setPageIndex(pagination.pageIndex - 1)}><i className="bi bi-chevron-left"></i></button>
+                             <button className="btn btn-modern btn-modern-outline btn-sm py-1 px-3" disabled={pagination.pageIndex === pagination.totalPage} onClick={() => setPageIndex(pagination.pageIndex + 1)}><i className="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+                )}
             </div>
-
-            {/* Pagination */}
-            {pagination && pagination.totalPage > 1 && (
-                <nav>
-                    <ul className="pagination justify-content-center">
-                        <li className={`page-item ${pagination.pageIndex === 1 ? "disabled" : ""}`}>
-                            <button className="page-link" onClick={() => setPageIndex(pagination.pageIndex - 1)}>Trước</button>
-                        </li>
-                        {Array.from({ length: pagination.totalPage }, (_, i) => i + 1).map(page => (
-                            <li key={page} className={`page-item ${page === pagination.pageIndex ? "active" : ""}`}>
-                                <button className="page-link" onClick={() => setPageIndex(page)}>{page}</button>
-                            </li>
-                        ))}
-                        <li className={`page-item ${pagination.pageIndex === pagination.totalPage ? "disabled" : ""}`}>
-                            <button className="page-link" onClick={() => setPageIndex(pagination.pageIndex + 1)}>Sau</button>
-                        </li>
-                    </ul>
-                </nav>
-            )}
-
-            <CommonModal
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                title="Xác nhận xóa sản phẩm"
-                onSave={handleDelete}
-                saveText="Xóa"
-                saveVariant="danger"
-                loading={loading}
-            >
-                <p>Bạn có chắc muốn xóa sản phẩm <strong>"{deletingName}"</strong>?</p>
-                <p className="text-danger small">Tất cả biến thể sẽ bị xóa theo.</p>
-            </CommonModal>
+            <style>{` .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; } `}</style>
         </div>
     );
 }

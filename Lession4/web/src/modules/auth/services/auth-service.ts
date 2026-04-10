@@ -13,7 +13,7 @@ export default class AuthService implements IAuthService {
     async loginAsync(value: LoginDTO): Promise<LoginResponseDTO> {
         const users = await this.userRepo.getAsync(undefined, undefined, (queryDB) => {
             return queryDB.select('*').eq('userName', value.userName)
-                        .eq('status', UserStatus.ACTIVE).single();
+                        .eq('status', UserStatus.ACTIVE);
         });
         const user = users.data[0];
         if (!user) {

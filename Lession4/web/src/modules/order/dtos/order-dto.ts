@@ -31,7 +31,7 @@ export function toOrderViewDTO(value: Order): OrderViewDTO {
         customerId: value.customerId,
         orderDate: value.orderDate,
         totalAmount: value.totalAmount,
-        totalPrice: 0,
+        totalPrice: value.totalPrice,
         status: value.status,
         shippingAddress: value.shippingAddress ?? ""
     }

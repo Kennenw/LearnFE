@@ -5,306 +5,98 @@ import CommonSelect from "@core/ui/components/common-select";
 import type { CategoryViewDTO, CategoryCreateDTO, CategoryUpdateDTO } from "../dtos/category-dto";
 
 export default function CategoryPage() {
-    const {
-        data,
-        allData,
-        pagination,
-        loading,
-        search,
-        setSearch,
-        setPageIndex,
-        createCategory,
-        updateCategory,
-        deleteCategory,
-        reload,
-    } = useCategory();
-
+    const { data, allCategory, search, setSearch, createCategory, updateCategory, deleteCategory, reload } = useCategory();
     const [showModal, setShowModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState<CategoryViewDTO | null>(null);
-
-    const [formData, setFormData] = useState({
-        name: "",
-        parentId: undefined as string | undefined,
-    });
-
+    const [formData, setFormData] = useState({ name: "", parentId: undefined as string | undefined });
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deletingId, setDeletingId] = useState<string>("");
-    const [deletingName, setDeletingName] = useState<string>("");
-
+    const [deletingId, setDeletingId] = useState("");
+    const [deletingName, setDeletingName] = useState("");
     const [parentOptions, setParentOptions] = useState<{ value: string; label: string }[]>([]);
-    const [loadingParents, setLoadingParents] = useState(false);
 
     useEffect(() => {
-        const loadParentOptions = async () => {
-            setLoadingParents(true);
-            try {
-                const allCategories = allData?.data;
-
-                const options = allCategories!
-                    .filter(category => category.id !== editingCategory?.id) 
-                    .map(category => ({
-                        value: category.id,
-                        label: category.name
-                    }));
-
-                setParentOptions(options);
-            } catch (error) {
-                console.error("Failed to load parent categories:", error);
-                setParentOptions([]);
-            } finally {
-                setLoadingParents(false);
-            }
-        };
-
-        if (showModal) {
-            loadParentOptions();
+        if (showModal && allCategory?.data) {
+            setParentOptions(allCategory.data.filter(c => c.id !== editingCategory?.id).map(c => ({ value: c.id, label: c.name })));
         }
-    }, [showModal, editingCategory, allData]);
-
-    const openCreateModal = () => {
-        setEditingCategory(null);
-        setFormData({ name: "", parentId: undefined });
-        setShowModal(true);
-    };
-
-    const openEditModal = (category: CategoryViewDTO) => {
-        setEditingCategory(category);
-        setFormData({
-            name: category.name,
-            parentId: category.parentId,
-        });
-        setShowModal(true);
-    };
-
-    const openDeleteConfirm = (id: string, name: string) => {
-        setDeletingId(id);
-        setDeletingName(name);
-        setShowDeleteModal(true);
-    };
+    }, [showModal, editingCategory, allCategory]);
 
     const handleSave = async () => {
-        if (!formData.name.trim()) {
-            alert("Vui lòng nhập tên danh mục!");
-            return;
-        }
-
-        const payload = {
-            name: formData.name.trim(),
-            parentId: formData.parentId || undefined,
-        };
-
+        if (!formData.name.trim()) return;
         try {
-            if (editingCategory) {
-                await updateCategory({ ...payload, id: editingCategory.id } as CategoryUpdateDTO);
-            } else {
-                await createCategory(payload as CategoryCreateDTO);
-            }
+            if (editingCategory) await updateCategory({ ...formData, id: editingCategory.id } as CategoryUpdateDTO);
+            else await createCategory(formData as CategoryCreateDTO);
             setShowModal(false);
-        } catch (error) {
-            console.error("Save failed:", error);
-            alert("Có lỗi xảy ra khi lưu danh mục!");
-        }
-    };
-
-    const handleDelete = async () => {
-        if (!deletingId) return;
-        try {
-            await deleteCategory(deletingId);
-            setShowDeleteModal(false);
-        } catch (error) {
-            console.error("Delete failed:", error);
-            alert("Không thể xóa danh mục!");
-        }
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const getParentName = (parentId?: string) => {
-        if (!parentId) return "Không có";
-        const parent = data.find(c => c.id === parentId);
-        return parent ? `${parent.name}` : `Không có`;
+        } catch { alert("Error saving."); }
     };
 
     return (
-        <div className="container mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Quản lý Danh mục (Category)</h2>
-                <button className="btn btn-success" onClick={openCreateModal}>
-                    + Thêm danh mục mới
-                </button>
-            </div>
-
-            <div className="row mb-3">
-                <div className="col-md-6">
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Tìm kiếm danh mục..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+        <div className="container-fluid px-0">
+            <header className="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 className="fw-bold mb-1">Taxonomy</h2>
+                    <p className="text-muted small mb-0">Organize and classify your product inventory</p>
                 </div>
-                <div className="col-md-6 text-end">
-                    <button className="btn btn-outline-secondary" onClick={reload}>
-                        ↻ Tải lại
+                <div className="d-flex gap-2">
+                    <button className="btn btn-modern btn-modern-outline" onClick={reload}><i className="bi bi-arrow-clockwise"></i></button>
+                    <button className="btn btn-modern btn-modern-primary px-4" onClick={() => { setEditingCategory(null); setFormData({ name: "", parentId: undefined }); setShowModal(true); }}>
+                        <i className="bi bi-plus-lg me-2"></i> New Node
                     </button>
                 </div>
-            </div>
+            </header>
 
-            <div className="table-responsive">
-                <table className="table table-striped table-hover align-middle">
-                    <thead className="table-dark">
-                        <tr>
-                            <th style={{ width: "40%" }}>Tên danh mục</th>
-                            <th style={{ width: "30%" }}>Danh mục cha</th>
-                            <th style={{ width: "30%" }} className="text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading && data.length === 0 ? (
+            <div className="card-modern border-0 shadow-sm overflow-hidden mt-4">
+                <div className="p-4 bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <div className="col-md-5">
+                        <div className="input-group overflow-hidden border rounded-3 bg-light bg-opacity-50 ps-3">
+                            <span className="input-group-text bg-transparent border-0 pe-1 text-muted"><i className="bi bi-search"></i></span>
+                            <input type="text" className="form-control border-0 bg-transparent shadow-none py-2" placeholder="Find category..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="table-responsive">
+                    <table className="table table-modern mb-0">
+                        <thead>
                             <tr>
-                                <td colSpan={3} className="text-center py-4">
-                                    <div className="spinner-border text-primary" role="status" />
-                                </td>
+                                <th className="px-4">Classification Label</th>
+                                <th>Hierarchical Parent</th>
+                                <th className="text-center">Controls</th>
                             </tr>
-                        ) : data.length === 0 ? (
-                            <tr>
-                                <td colSpan={3} className="text-center py-4 text-muted">
-                                    Không có dữ liệu
-                                </td>
-                            </tr>
-                        ) : (
-                            data.map((category) => (
-                                <tr key={category.id}>
-                                    <td>{category.name}</td>
-                                    <td>{getParentName(category.parentId)}</td>
+                        </thead>
+                        <tbody>
+                            {data.map((c) => (
+                                <tr key={c.id}>
+                                    <td className="px-4 fw-bold text-dark">{c.name}</td>
+                                    <td>
+                                        <div className="d-flex align-items-center gap-2">
+                                            <div className="bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small fw-bold" style={{ fontSize: '10px' }}>
+                                                {data.find(parent => parent.id === c.parentId)?.name || "ROOT"}
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td className="text-center">
-                                        <button
-                                            className="btn btn-sm btn-warning me-2"
-                                            onClick={() => openEditModal(category)}
-                                        >
-                                            Sửa
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => openDeleteConfirm(category.id, category.name)}
-                                        >
-                                            Xóa
-                                        </button>
+                                        <button className="btn btn-link text-decoration-none small fw-bold me-2" onClick={() => { setEditingCategory(c); setFormData({ name: c.name, parentId: c.parentId }); setShowModal(true); }}>Edit</button>
+                                        <button className="btn btn-link text-danger text-decoration-none small fw-bold" onClick={() => { setDeletingId(c.id); setDeletingName(c.name); setShowDeleteModal(true); }}>Archive</button>
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            {pagination && pagination.totalPage > 1 && (
-                <nav aria-label="Pagination">
-                    <ul className="pagination justify-content-center">
-                        <li className={`page-item ${pagination.pageIndex === 1 ? "disabled" : ""}`}>
-                            <button
-                                className="page-link"
-                                onClick={() => setPageIndex(pagination.pageIndex - 1)}
-                            >
-                                Trước
-                            </button>
-                        </li>
-
-                        {Array.from({ length: pagination.totalPage }, (_, i) => i + 1).map((page) => (
-                            <li
-                                key={page}
-                                className={`page-item ${page === pagination.pageIndex ? "active" : ""}`}
-                            >
-                                <button
-                                    className="page-link"
-                                    onClick={() => setPageIndex(page)}
-                                >
-                                    {page}
-                                </button>
-                            </li>
-                        ))}
-
-                        <li className={`page-item ${pagination.pageIndex === pagination.totalPage ? "disabled" : ""}`}>
-                            <button
-                                className="page-link"
-                                onClick={() => setPageIndex(pagination.pageIndex + 1)}
-                            >
-                                Sau
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            )}
-
-            <CommonModal
-                show={showModal}
-                onHide={() => setShowModal(false)}
-                title={editingCategory ? "Sửa danh mục" : "Thêm danh mục mới"}
-                onSave={handleSave}
-                saveText={editingCategory ? "Cập nhật" : "Tạo mới"}
-                loading={loading}
-                size="lg"
-                backdrop="static"
-            >
-                <div className="row">
-                    <div className="col-12">
-                        <div className="mb-3 d-flex flex-column align-items-start">
-                            <label className="form-label fw-bold">
-                                Tên danh mục <span className="text-danger">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                className="form-control"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                placeholder="Nhập tên danh mục"
-                                required
-                            />
-                        </div>
-
-                        <CommonSelect
-                            label="Danh mục cha (Parent)"
-                            options={parentOptions}
-                            value={formData.parentId}
-                            onChange={(newParentId) =>
-                                setFormData(prev => ({ ...prev, parentId: newParentId }))
-                            }
-                            placeholder="Chọn danh mục cha (nếu có)"
-                            loading={loadingParents}
-                            showSearch={true}
-                            required={false}
-                        />
-                    </div>
+            <CommonModal show={showModal} onHide={() => setShowModal(false)} title="Classification Detail" onSave={handleSave}>
+                <div className="mb-4">
+                    <label className="form-label small fw-bold text-muted text-uppercase mb-2">Display Name</label>
+                    <input type="text" className="form-control form-input-modern" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Footwear" />
+                </div>
+                <div className="mb-2">
+                    <CommonSelect label="Parent Node" options={parentOptions} value={formData.parentId} onChange={(val) => setFormData({ ...formData, parentId: val })} />
                 </div>
             </CommonModal>
 
-            <CommonModal
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                title="Xác nhận xóa danh mục"
-                onSave={handleDelete}
-                saveText="Xóa"
-                saveVariant="danger"
-                loading={loading}
-                backdrop="static"
-            >
-                <div className="text-center py-3">
-                    <p className="fs-5">
-                        Bạn có chắc chắn muốn xóa danh mục:{" "}
-                        <strong className="text-danger">"{deletingName}"</strong> ?
-                    </p>
-                    <p className="text-muted small">
-                        Hành động này không thể hoàn tác.
-                    </p>
-                </div>
+            <CommonModal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} title="Archive Node" onSave={async () => { await deleteCategory(deletingId); setShowDeleteModal(false); }} saveVariant="danger">
+                <div className="text-center p-3 text-danger"><p className="mb-0">Are you sure you want to archive <strong>{deletingName}</strong>?</p></div>
             </CommonModal>
         </div>
     );

@@ -29,83 +29,90 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-
         if (!formData.userName || !formData.password) {
-            setError("Vui lòng nhập đầy đủ thông tin!");
+            setError("Please fill in all fields!");
             return;
         }
-
         try {
             await login(formData);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setError(err.message || "Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+            setError(err.message || "Login failed! Please check your credentials.");
         }
     };
 
     return (
-        <div className="container">
-            <div className="row justify-content-center mt-5">
-                <div className="col-md-6 col-lg-4">
-                    <div className="card shadow">
-                        <div className="card-body p-4">
-                            <h2 className="text-center mb-4">Đăng nhập</h2>
-
-                            {error && (
-                                <div className="alert alert-danger">{error}</div>
-                            )}
-
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3 d-flex flex-column align-items-start">
-                                    <label className="form-label">Tên đăng nhập</label>
-                                    <input
-                                        type="text"
-                                        name="userName"
-                                        className="form-control"
-                                        value={formData.userName}
-                                        onChange={handleChange}
-                                        placeholder="Nhập tên đăng nhập"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="mb-3 d-flex flex-column align-items-start">
-                                    <label className="form-label">Mật khẩu</label>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        className="form-control"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        placeholder="Nhập mật khẩu"
-                                        required
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary w-100 mb-3"
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="spinner-border spinner-border-sm me-2" />
-                                            Đang đăng nhập...
-                                        </>
-                                    ) : "Đăng nhập"}
-                                </button>
-                            </form>
-
-                            <div className="text-center">
-                                <p>
-                                    Chưa có tài khoản?{" "}
-                                    <Link to="/register" className="text-decoration-none">
-                                        Đăng ký ngay
-                                    </Link>
-                                </p>
-                            </div>
-                        </div>
+        <div className="vh-100 d-flex align-items-center justify-content-center bg-light">
+            <div className="col-11 col-sm-8 col-md-6 col-lg-4 col-xl-3">
+                <div className="text-center mb-4">
+                    <div className="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: "60px", height: "60px" }}>
+                        <i className="bi bi-cart-fill fs-3"></i>
                     </div>
+                    <h2 className="fw-bold">ModernStore</h2>
+                    <p className="text-muted">Welcome back! Please login to continue.</p>
+                </div>
+
+                <div className="card-modern shadow-lg p-4 border-0">
+                    {error && (
+                        <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger small py-2">
+                            <i className="bi bi-exclamation-circle me-2"></i>{error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label className="form-label small fw-bold text-muted text-uppercase mb-2">Username</label>
+                            <input
+                                type="text"
+                                name="userName"
+                                className="form-control form-control-modern"
+                                value={formData.userName}
+                                onChange={handleChange}
+                                placeholder="name@example.com"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="form-label small fw-bold text-muted text-uppercase mb-2">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                className="form-control form-control-modern"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="btn-modern btn-modern-primary w-100 justify-content-center py-2"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" />
+                                    Authenticating...
+                                </>
+                            ) : "Sign In"}
+                        </button>
+                    </form>
+
+                    <div className="text-center mt-4">
+                        <p className="text-muted small mb-0">
+                            Don't have an account?{" "}
+                            <Link to="/register" className="text-primary fw-bold text-decoration-none hover-underline">
+                                Create account
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+
+                <div className="text-center mt-5">
+                    <Link to="/shop" className="text-muted small text-decoration-none">
+                        <i className="bi bi-arrow-left me-1"></i> Back to shop
+                    </Link>
                 </div>
             </div>
         </div>
