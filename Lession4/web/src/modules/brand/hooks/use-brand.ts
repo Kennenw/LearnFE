@@ -1,10 +1,11 @@
 import { BrandController } from "../controller/brand-controller";
-import type { BrandUpdateDTO, BrandViewDTO } from "../dtos/brand-dto";
+import type { BrandCreateDTO, BrandUpdateDTO, BrandViewDTO } from "../dtos/brand-dto";
 import type { PaginationResult } from "@core/types/common";
 import { useEffect, useState, useCallback } from "react";
 
 export function useBrand() {
     const [pagination, setPagination] = useState<PaginationResult<BrandViewDTO> | null>(null);
+    const [allData, setAllData] = useState<PaginationResult<BrandViewDTO> | null>(null);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [pageIndex, setPageIndex] = useState(1);
@@ -19,7 +20,6 @@ export function useBrand() {
                 pageIndex,
                 pageSize
             });
-
             setPagination(res);
 
         } catch (err) {
@@ -29,21 +29,31 @@ export function useBrand() {
         }
     }, [pageIndex, search]);
 
+    const fetchAllData = useCallback(async () => {
+            try {
+                setLoading(true);
+    
+                const res = await BrandController.getBrands({});
+                setAllData(res);
+    
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }, []);
+
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+        fetchAllData();
+    }, [fetchAllData, fetchData]);
 
     const setPage = (page: number) => {
         if (page < 1) return;
         setPageIndex(page);
     };
 
-    const handleSearch = (val: string) => {
-        setSearch(val);
-        setPageIndex(1);
-    }
-
-    const createBrand = async (payload: { name: string, description: string }) => {
+    const createBrand = async (payload: BrandCreateDTO) => {
         try {
             setLoading(true);
             await BrandController.createBrand(payload);
@@ -75,6 +85,7 @@ export function useBrand() {
 
     return {
         data: pagination?.data ?? [],
+        allBrand: allData,
         pagination,
         loading,
         search,

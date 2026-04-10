@@ -2,6 +2,8 @@ import Product from "../models/product";
 import Category from "../../category/models/category";
 import Brand from "../../brand/models/brand";
 import { ProductStatus } from "@core/enum/product";
+import { PaginationQuery } from "@core/types/common";
+import { Sort } from "@core/enum/common";
 
 export interface ProductViewDTO {
     id: string;
@@ -12,6 +14,12 @@ export interface ProductViewDTO {
     brandId: string;
     brandName: string;
     status: ProductStatus;
+}
+
+export interface ProductPaginationQuery extends PaginationQuery {
+    categoryId?: string; 
+    brandId?: string; 
+    sortByPrice?: Sort;
 }
 
 export interface ProductCreateDTO {

@@ -1,3 +1,4 @@
+import { PaginationQuery } from "@core/types/common";
 import { Role, UserStatus } from "../../../core/enum/user";
 import User from "../models/user";
 
@@ -17,6 +18,11 @@ export interface UserCreateDTO {
 export interface UserUpdateDTO extends Partial<UserCreateDTO> {
 
 
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UserPaginationQuery extends PaginationQuery{
+    
 }
 
 export function toUserViewDTO(value: User): UserViewDTO {

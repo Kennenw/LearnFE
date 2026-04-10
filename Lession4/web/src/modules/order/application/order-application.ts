@@ -1,12 +1,13 @@
 import { PaginationResult } from "../../../core/types/common";
 import { OrderApplicationCreateDTO, OrderApplicationViewDTO } from "../dtos/order-application-dto";
-import IOrderApplicationService from "./iorder-application";
+import IOrderApplication from "./iorder-application";
 
-export default class OrderApplicationService implements IOrderApplicationService {
-    createOrder(value: OrderApplicationCreateDTO): Promise<string> {
+export default class OrderApplication implements IOrderApplication {
+    createOrderAsync(value: OrderApplicationCreateDTO): Promise<string> {
         throw new Error("Method not implemented.");
     }
-    getOrderByUserId(userId: string): Promise<PaginationResult<OrderApplicationViewDTO>> {
+    getByUserId(id: string): Promise<PaginationResult<OrderApplicationViewDTO>> {
         throw new Error("Method not implemented.");
     }
+    
 }

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useBrand } from "../hooks/use-brand";
+import CommonModal from "@core/ui/components/common-modal";
+import type { BrandViewDTO } from "../dtos/brand-dto";   // Giả sử bạn có DTO tương tự
 
 const SearchIcon = () => (
   <svg
@@ -72,176 +74,91 @@ const DeleteIcon = () => (
 );
 
 export default function BrandPage() {
-  const {
-    data,
-    loading,
-    search,
-    setSearch,
-    setPageIndex,
-    pagination,
-    createBrand,
-    updateBrand,
-    deleteBrand,
-  } = useBrand();
+    const {
+        data,
+        pagination,
+        loading,
+        search,
+        setSearch,
+        setPageIndex,
+        createBrand,
+        updateBrand,
+        deleteBrand,
+    } = useBrand();
 
-  const [name, setName] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const trimmedName = name.trim();
+    const [showBrandModal, setShowBrandModal] = useState(false);
+    const [editingBrand, setEditingBrand] = useState<BrandViewDTO | null>(null);
+    const [brandName, setBrandName] = useState("");
 
-  const handleSubmit = async () => {
-    if (!trimmedName) return;
-    if (editingId) {
-      await updateBrand({ id: editingId, name: trimmedName });
-    } else {
-      await createBrand({ name: trimmedName });
-    }
-    setName("");
-    setEditingId(null);
-    closeModal("brandModal");
-  };
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletingBrand, setDeletingBrand] = useState<BrandViewDTO | null>(null);
 
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    await deleteBrand(deleteId);
-    setDeleteId(null);
-    closeModal("deleteModal");
-  };
+    const openCreateModal = () => {
+        setEditingBrand(null);
+        setBrandName("");
+        setShowBrandModal(true);
+    };
 
-  const openCreate = () => {
-    setEditingId(null);
-    setName("");
-  };
+    const openEditModal = (brand: BrandViewDTO) => {
+        setEditingBrand(brand);
+        setBrandName(brand.name);
+        setShowBrandModal(true);
+    };
 
-  const openEdit = (id: string, currentName: string) => {
-    setEditingId(id);
-    setName(currentName);
-  };
+    const openDeleteConfirm = (brand: BrandViewDTO) => {
+        setDeletingBrand(brand);
+        setShowDeleteModal(true);
+    };
 
-  const closeModal = (id: string) => {
-    const modal = document.getElementById(id);
-    if (modal) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const bootstrap = (window as any).bootstrap;
-      if (bootstrap) {
-        const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
-        bsModal?.hide();
-      }
-    }
-  };
+    const handleSaveBrand = async () => {
+        if (!brandName.trim()) {
+            alert("Brand name is required!");
+            return;
+        }
 
-  const currentPage = pagination?.pageIndex ?? 1;
-  const totalPage = pagination?.totalPage ?? 1;
+        try {
+            if (editingBrand) {
+                await updateBrand({ id: editingBrand.id, name: brandName.trim() });
+            } else {
+                await createBrand({ name: brandName.trim() });
+            }
+            setShowBrandModal(false);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save brand!");
+        }
+    };
 
-  return (
-    <>
-      <div
-        className="animate-fade-in"
-        style={{ maxWidth: "1000px", margin: "0 auto" }}
-      >
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h1 style={{ margin: 0, fontSize: "2rem" }}>Brand Management</h1>
-            <p className="text-muted">
-              Manage system brands and their identities.
-            </p>
-          </div>
-          <button
-            className="btn-modern btn-modern-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#brandModal"
-            onClick={openCreate}
-          >
-            <PlusIcon /> Add New Brand
-          </button>
-        </div>
+    const handleDeleteBrand = async () => {
+        if (!deletingBrand) return;
+        try {
+            await deleteBrand(deletingBrand.id);
+            setShowDeleteModal(false);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete brand!");
+        }
+    };
 
-        <div className="glass-card p-4 mb-4">
-          <div className="position-relative mb-4">
-            <span className="position-absolute top-50 translate-middle-y ms-3 text-muted">
-              <SearchIcon />
-            </span>
-            <input
-              className="input-modern ps-5"
-              placeholder="Find by brand name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+    const currentPage = pagination?.pageIndex ?? 1;
+    const totalPages = pagination?.totalPage ?? 1;
+    return (
+        <div className="container mt-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Brand Management</h2>
+                <button className="btn btn-success" onClick={openCreateModal}>
+                    + Add New Brand
+                </button>
+            </div>
 
-          <div className="table-responsive">
-            <table className="table-modern">
-              <thead>
-                <tr>
-                  <th>Brand ID</th>
-                  <th>Name</th>
-                  <th style={{ textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={3} className="text-center py-5">
-                      <div className="spinner-border spinner-border-sm text-primary me-2"></div>
-                      Loading brand data...
-                    </td>
-                  </tr>
-                ) : pagination === null ? (
-                  <tr>
-                    <td colSpan={3} className="text-center py-5 text-muted">
-                      Initializing repository...
-                    </td>
-                  </tr>
-                ) : data.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="text-center py-5 text-muted">
-                      No brands found in the system.
-                    </td>
-                  </tr>
-                ) : (
-                  data.map((b) => (
-                    <tr key={b.id} className="animate-fade-in">
-                      <td>
-                        <span className="badge-modern">{b.id.slice(0, 8)}</span>
-                      </td>
-                      <td style={{ fontWeight: 600 }}>{b.name}</td>
-                      <td style={{ textAlign: "right" }}>
-                        <button
-                          className="btn-modern btn-modern-outline me-2"
-                          style={{ padding: "0.5rem" }}
-                          data-bs-toggle="modal"
-                          data-bs-target="#brandModal"
-                          onClick={() => openEdit(b.id, b.name)}
-                          title="Edit Brand"
-                        >
-                          <EditIcon />
-                        </button>
-
-                        <button
-                          className="btn-modern btn-modern-outline"
-                          style={{
-                            padding: "0.5rem",
-                            color: "#ef4444",
-                            borderColor: deleteId === b.id ? "#ef4444" : "",
-                          }}
-                          data-bs-toggle="modal"
-                          data-bs-target="#deleteModal"
-                          onClick={() => setDeleteId(b.id)}
-                          title="Delete Brand"
-                        >
-                          <DeleteIcon />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <div className="text-muted small">
-              Page {currentPage} of {totalPage}
+            <div className="mb-3">
+                <input
+                    type="text"
+                    className="form-control w-50"
+                    placeholder="Search brands..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </div>
             <div className="d-flex gap-2">
               <button
@@ -265,31 +182,50 @@ export default function BrandPage() {
         </div>
       </div>
 
-      {/* Modals outside the animated container */}
-      <div
-        className="modal fade"
-        id="brandModal"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div
-            className="modal-content glass-card p-2"
-            style={{ transform: "none" }}
-          >
-            <div className="modal-header border-0">
-              <h5
-                className="modal-title"
-                style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}
-              >
-                {editingId ? "Edit Brand" : "Create New Brand"}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+            <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                    <thead className="table-dark">
+                        <tr>
+                            <th>Brand Name</th>
+                            <th className="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loading && data.length === 0 ? (
+                            <tr>
+                                <td colSpan={2} className="text-center py-4">
+                                    <div className="spinner-border text-primary" />
+                                </td>
+                            </tr>
+                        ) : data.length === 0 ? (
+                            <tr>
+                                <td colSpan={2} className="text-center py-4 text-muted">
+                                    No brands found
+                                </td>
+                            </tr>
+                        ) : (
+                            data.map((brand) => (
+                                <tr key={brand.id}>
+                                    <td>{brand.name}</td>
+                                    <td className="text-center">
+                                        <button
+                                            className="btn btn-warning btn-sm me-2"
+                                            onClick={() => openEditModal(brand)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="btn btn-danger btn-sm"
+                                            onClick={() => openDeleteConfirm(brand)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
             <div className="modal-body py-4">
               <label className="small text-muted mb-2 d-block">Brand Name</label>
@@ -319,54 +255,90 @@ export default function BrandPage() {
         </div>
       </div>
 
-      <div
-        className="modal fade"
-        id="deleteModal"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div
-            className="modal-content glass-card p-2"
-            style={{ transform: "none" }}
-          >
-            <div className="modal-header border-0">
-              <h5
-                className="modal-title text-danger"
-                style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}
-              >
-                Delete Brand
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body py-4">
-              <p className="text-muted">
-                Are you sure you want to delete this brand from the repository?
-                This action is permanent.
-              </p>
-            </div>
-            <div className="modal-footer border-0">
-              <button
-                className="btn-modern btn-modern-outline"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button
-                className="btn-modern btn-modern-primary"
-                style={{ backgroundColor: "#ef4444" }}
-                disabled={loading}
-                onClick={handleDelete}
-              >
-                Delete Brand
-              </button>
-            </div>
-          </div>
+            {pagination && totalPages > 1 && (
+                <nav>
+                    <ul className="pagination justify-content-center">
+                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => setPageIndex(currentPage - 1)}
+                            >
+                                Previous
+                            </button>
+                        </li>
+
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <li
+                                key={page}
+                                className={`page-item ${page === currentPage ? "active" : ""}`}
+                            >
+                                <button
+                                    className="page-link"
+                                    onClick={() => setPageIndex(page)}
+                                >
+                                    {page}
+                                </button>
+                            </li>
+                        ))}
+
+                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => setPageIndex(currentPage + 1)}
+                            >
+                                Next
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            )}
+
+            <CommonModal
+                show={showBrandModal}
+                onHide={() => setShowBrandModal(false)}
+                title={editingBrand ? "Edit Brand" : "Create New Brand"}
+                onSave={handleSaveBrand}
+                saveText={editingBrand ? "Update" : "Create"}
+                loading={loading}
+                backdrop="static"
+            >
+                <div className="mb-3 d-flex flex-column align-items-start">
+                    <label className="form-label fw-bold">
+                        Brand Name <span className="text-danger">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={brandName}
+                        onChange={(e) => setBrandName(e.target.value)}
+                        placeholder="Enter brand name"
+                        required
+                    />
+                </div>
+            </CommonModal>
+
+            <CommonModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                title="Confirm Delete"
+                onSave={handleDeleteBrand}
+                saveText="Delete"
+                saveVariant="danger"
+                loading={loading}
+                backdrop="static"
+            >
+                <div className="text-center py-3 ">
+                    <p className="fs-5 mb-1">
+                        Are you sure you want to delete the brand:
+                    </p>
+                    <p className="fw-bold text-danger">
+                        "{deletingBrand?.name}"
+                    </p>
+                    <p className="text-muted small">
+                        This action cannot be undone.
+                    </p>
+                </div>
+            </CommonModal>
         </div>
       </div>
     </>

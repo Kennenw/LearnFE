@@ -1,6 +1,8 @@
-import { ProductCreateApplicationDTO, ProductDetailDTO } from "../dtos/product-application-dto";
+import { ProductCreateApplicationDTO, ProductDetailDTO, ProductUpdateApplicationDTO } from "../dtos/product-application-dto";
 
 export default interface IProductApplication {
-    createProductApplication(value: ProductDetailDTO): Promise<string>;
-    getProductDetail(id: string): Promise<ProductCreateApplicationDTO>;
+    createAsync(value: ProductCreateApplicationDTO): Promise<string>;
+    getByIdAsync(id: string): Promise<ProductDetailDTO>;
+    updateAsync(value: ProductUpdateApplicationDTO): Promise<string>;
+    deleteAsync(id: string): Promise<string>;
 }

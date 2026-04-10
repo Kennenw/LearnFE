@@ -3,7 +3,7 @@ import IGenericRepository from "@core/interfaces/igeneric-repository";
 import { PaginationResult } from "@core/types/common";
 import Brand from "../../brand/models/brand";
 import Category from "../../category/models/category";
-import { ProductCreateDTO, ProductViewDTO, ProductUpdateDTO, toProductViewDTO } from "../dtos/product-dto";
+import { ProductCreateDTO, ProductViewDTO, ProductUpdateDTO, toProductViewDTO, ProductPaginationQuery } from "../dtos/product-dto";
 import Product from "../models/product";
 import IProductService from "./iproduct-service";
 import { Pagination } from '@core/utils/pagination';
@@ -19,47 +19,42 @@ export default class ProductService implements IProductService {
         this.productRepo = productRepo;
     }
 
-    async createProduct(value: ProductCreateDTO): Promise<Product> {
+    async createAsync(value: ProductCreateDTO): Promise<Product> {
         const product = new Product(value.name, value.description, value.categoryId, value.brandId, value.status);
         await this.productRepo.addAsync(product);
         return product;
     }
 
-    async getAllProducts(search?: string, categoryId?: string, brandId?: string, sortBy?: Sort, pageIndex?: number, pageSize?: number): Promise<PaginationResult<ProductViewDTO>> {
-        const products = await this.productRepo.getAsync(pageIndex, pageSize, query => {
-            query = query.select(`*, variants!inner(*)`);
-            if (search) {
-                query.ilike('name', `%${search}%`);
+    async getAsync(query: ProductPaginationQuery): Promise<PaginationResult<ProductViewDTO>> {
+        const products = await this.productRepo.getAsync(query.pageIndex, query.pageSize, queryDB => {
+            let querySearch = queryDB.select(`*, product_variants(price), categories(*), brands(*)`);
+            if (queryDB.search) {
+                querySearch.ilike('name', `%${query.search}%`);
             }
-            if (categoryId) {
-                query.eq('categoryId', categoryId);
+            if (query.categoryId) {
+                querySearch.eq('categoryId', query.categoryId);
             }
-            if (brandId) {
-                query.eq('brandId', brandId);
+            if (query.brandId) {
+                querySearch.eq('brandId', query.brandId);
             }
-          
-            if (sortBy){
-                query = query.order("price", { ascending: sortBy === Sort.ASC });
+            if (query.sortByPrice) {
+                querySearch = querySearch.order("product_variants.price", { ascending: query.sortByPrice === Sort.ASC });
             }
-            return query;
+            return querySearch;
         });
-
-        const result = await Promise.all(products.data.map(async p => {
-            const brand = await this.brandRepo.getByIdAsync(p.brandId);
-            const category = await this.categoryRepo.getByIdAsync(p.categoryId);
-            return toProductViewDTO(p, category!, brand!);
+        const result = await Promise.all(products.data.map(async product => {
+            return toProductViewDTO(product, product.categories as Category, product.brands as Brand);
         }));
-
-        return Pagination(result, products.count, pageIndex, pageSize);
+        return Pagination(result, products.count, query.pageSize, query.pageIndex);
     }
 
-    async updateProduct(value: ProductUpdateDTO): Promise<string> {
+    async updateAsync(value: ProductUpdateDTO): Promise<string> {
         await this.productRepo.getByIdAsync(value.id);
         await this.productRepo.editAsync(value.id, value);
         return Promise.resolve("Cập nhật sản phẩm thành công");
     }
 
-    async getProductById(id: string): Promise<ProductViewDTO> {
+    async getByIdAsync(id: string): Promise<ProductViewDTO> {
         const product = await this.productRepo.getByIdAsync(id);
         if (!product) {
             return Promise.reject(new Error("Sản phẩm không tồn tại"));
@@ -75,9 +70,12 @@ export default class ProductService implements IProductService {
         return toProductViewDTO(product, category, brand);
     }
 
-    async deleteProduct(id: string): Promise<string> {
-        await this.productRepo.getByIdAsync(id);
-        await this.productRepo.removeAsync(id);
-        return Promise.resolve("Xóa sản phẩm thành công");
+    async deleteAsync(id: string): Promise<boolean> {
+        const product = await this.productRepo.getByIdAsync(id);
+        if (product) {
+            await this.productRepo.removeAsync(id);
+            return true;
+        }
+        return false;
     }
 }
