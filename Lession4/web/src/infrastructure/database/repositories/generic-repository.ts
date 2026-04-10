@@ -22,8 +22,9 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
         }
         const { data, error } = await query;
         if (error) {
-            return Promise.reject(Error(`Lỗi khi lấy data: ${error}`));
+            return Promise.reject(Error(`Error fetching data: ${error}`));
         };
+        console.log({ data: data, count: count ?? 0 })
         return { data: data, count: count ?? 0 };
     }
 
@@ -34,7 +35,7 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
                                     .eq('id', id)
                                     .single();
         if (error) {
-            return Promise.reject(Error(`Lỗi khi lấy data: ${error}`));
+            return Promise.reject(Error(`Error fetching data by ID: ${error}`));
         }
         if (data) {
             return data as T;
@@ -49,7 +50,7 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
             .from(this.tableName)
             .insert(arrData);
         if (error) {
-            return Promise.reject(Error(`Lỗi lưu data: ${error}`));
+            return Promise.reject(Error(`Error saving data: ${error}`));
         }
         return data;
     }
@@ -60,7 +61,7 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
             .delete()
             .eq('id', id);
         if (error) {
-            return Promise.reject(Error(`Lỗi xóa data: ${error}`));
+            return Promise.reject(Error(`Error deleting data: ${error}`));
         }
     }
 
@@ -71,7 +72,7 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
             .update(arrData)
             .eq('id', id);
         if (error) {
-            return Promise.reject(Error(`Lỗi cập nhật data: ${error}`));
+            return Promise.reject(Error(`Error updating data: ${error}`));
         }
     }
 
