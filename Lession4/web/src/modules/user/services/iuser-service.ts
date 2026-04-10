@@ -1,12 +1,12 @@
-import { Role } from '@core/enum/user';
+import { Role, UserStatus } from '@core/enum/user';
 import { PaginationResult } from '@core/types/common';
-import { UserCreateDTO, UserUpdateDTO, UserViewDTO } from '../dtos/user-dto';
+import { UserCreateDTO, UserPaginationQuery, UserUpdateDTO, UserViewDTO } from '../dtos/user-dto';
 export default interface IUserService {
-    createUser(value: UserCreateDTO): Promise<string>;
-    updateUser(id: string, value: UserUpdateDTO): Promise<string>;
-    getUser(search?: string, pageIndex?: number, pageSize?: number): Promise<PaginationResult<UserViewDTO>>;
-    getUserById(id: string): Promise<UserViewDTO>;
-    banUser(id: string): Promise<boolean>;
-    unBanUser(id: string): Promise<boolean>;
-    decentralize(id: string, role: Role): Promise<boolean>;
+    createAsync(value: UserCreateDTO): Promise<string>;
+    updateAsync(id: string, value: UserUpdateDTO): Promise<string>;
+    getAsync(query: UserPaginationQuery): Promise<PaginationResult<UserViewDTO>>;
+    getByIdAsync(id: string): Promise<UserViewDTO>;
+    changeStatusAsync(id: string, status: UserStatus): Promise<boolean>;
+    changeRoleAsync(id: string, role: Role): Promise<boolean>;
+    deleteAsync(id: string): Promise<boolean>;
 }

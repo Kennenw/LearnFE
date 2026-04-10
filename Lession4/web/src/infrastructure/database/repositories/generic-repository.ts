@@ -28,7 +28,11 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
     }
 
     async getByIdAsync(id: string): Promise<T | undefined> {
-        const { data, error } = await supabase.from(this.tableName).select("*").eq('id', id);
+        const { data, error } = await supabase
+                                    .from(this.tableName)
+                                    .select("*")
+                                    .eq('id', id)
+                                    .single();
         if (error) {
             return Promise.reject(Error(`Lỗi khi lấy data: ${error}`));
         }

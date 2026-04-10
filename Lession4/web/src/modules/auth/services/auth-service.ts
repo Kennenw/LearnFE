@@ -10,12 +10,12 @@ export default class AuthService implements IAuthService {
         this.userRepo = userRepo;
     }
 
-    async login(value: LoginDTO): Promise<LoginResponseDTO> {
-        const result = await this.userRepo.getAsync(undefined, undefined, (query) => {
-            return query.eq('userName', value.userName)
-                .eq('status', UserStatus.ACTIVE);
+    async loginAsync(value: LoginDTO): Promise<LoginResponseDTO> {
+        const users = await this.userRepo.getAsync(undefined, undefined, (queryDB) => {
+            return queryDB.select('*').eq('userName', value.userName)
+                        .eq('status', UserStatus.ACTIVE).single();
         });
-        const user = result.data[0];
+        const user = users.data[0];
         if (!user) {
             return Promise.reject(Error('Đăng nhập thất bại'));
         }
@@ -25,12 +25,12 @@ export default class AuthService implements IAuthService {
         return { id: user.id, userName: user.userName, role: user.role };
     }
 
-    async register(value: RegisterDTO): Promise<boolean> {
-        const result = await this.userRepo.getAsync(undefined, undefined, (query) => {
-            return query.eq('userName', value.userName)
+    async registerAsync(value: RegisterDTO): Promise<boolean> {
+        const users = await this.userRepo.getAsync(undefined, undefined, (queryDB) => {
+            return queryDB.select('*').eq('userName', value.userName)
                 .eq('status', UserStatus.ACTIVE);
         });
-        const user = result.data[0];
+        const user = users.data[0];
         if (user) {
             return Promise.reject(Error('Lỗi trùng tên trong hệ thông'));
         }

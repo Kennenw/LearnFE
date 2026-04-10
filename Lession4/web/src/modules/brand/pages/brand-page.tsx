@@ -1,200 +1,226 @@
 import { useState } from "react";
 import { useBrand } from "../hooks/use-brand";
+import CommonModal from "@core/ui/components/common-modal";
+import type { BrandViewDTO } from "../dtos/brand-dto";   // Giả sử bạn có DTO tương tự
 
 export default function BrandPage() {
     const {
         data,
+        pagination,
         loading,
         search,
         setSearch,
         setPageIndex,
-        pagination,
         createBrand,
         updateBrand,
-        deleteBrand
+        deleteBrand,
     } = useBrand();
 
-    const [name, setName] = useState("");
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [showBrandModal, setShowBrandModal] = useState(false);
+    const [editingBrand, setEditingBrand] = useState<BrandViewDTO | null>(null);
+    const [brandName, setBrandName] = useState("");
 
-    const handleSubmit = async () => {
-        if (!name) return;
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletingBrand, setDeletingBrand] = useState<BrandViewDTO | null>(null);
 
-        if (editingId) {
-            await updateBrand({ id: editingId, name });
-        } else {
-            await createBrand({ name });
+    const openCreateModal = () => {
+        setEditingBrand(null);
+        setBrandName("");
+        setShowBrandModal(true);
+    };
+
+    const openEditModal = (brand: BrandViewDTO) => {
+        setEditingBrand(brand);
+        setBrandName(brand.name);
+        setShowBrandModal(true);
+    };
+
+    const openDeleteConfirm = (brand: BrandViewDTO) => {
+        setDeletingBrand(brand);
+        setShowDeleteModal(true);
+    };
+
+    const handleSaveBrand = async () => {
+        if (!brandName.trim()) {
+            alert("Brand name is required!");
+            return;
         }
 
-        setName("");
-        setEditingId(null);
-        closeModal("brandModal");
+        try {
+            if (editingBrand) {
+                await updateBrand({ id: editingBrand.id, name: brandName.trim() });
+            } else {
+                await createBrand({ name: brandName.trim() });
+            }
+            setShowBrandModal(false);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save brand!");
+        }
     };
 
-    const handleDelete = async () => {
-        if (!deleteId) return;
-        await deleteBrand(deleteId);
-        setDeleteId(null);
-        closeModal("deleteModal");
-    };
-
-    const openCreate = () => {
-        setEditingId(null);
-        setName("");
-    };
-
-    const openEdit = (id: string, currentName: string) => {
-        setEditingId(id);
-        setName(currentName);
-    };
-
-    const closeModal = (id: string) => {
-        const modal = document.getElementById(id);
-        if (modal) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const bsModal = (window as any).bootstrap.Modal.getInstance(modal);
-            bsModal?.hide();
+    const handleDeleteBrand = async () => {
+        if (!deletingBrand) return;
+        try {
+            await deleteBrand(deletingBrand.id);
+            setShowDeleteModal(false);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete brand!");
         }
     };
 
     const currentPage = pagination?.pageIndex ?? 1;
-    const totalPage = pagination?.totalPage ?? 1;
-
+    const totalPages = pagination?.totalPage ?? 1;
     return (
         <div className="container mt-4">
-            <h2>Brand Management</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Brand Management</h2>
+                <button className="btn btn-success" onClick={openCreateModal}>
+                    + Add New Brand
+                </button>
+            </div>
 
-            <input
-                className="form-control my-3"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
+            <div className="mb-3">
+                <input
+                    type="text"
+                    className="form-control w-50"
+                    placeholder="Search brands..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
 
-            <button
-                className="btn btn-primary mb-3"
-                data-bs-toggle="modal"
-                data-bs-target="#brandModal"
-                onClick={openCreate}
-            >
-                Add Brand
-            </button>
-
-            <table className="table table-bordered">
-                <thead className="table-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {loading ? (
-                        <tr><td colSpan={2}>Loading...</td></tr>
-                    ) : (
-                        data.map(b => (
-                            <tr key={b.id}>
-                                <td>{b.name}</td>
-                                <td>
-                                    <button
-                                        className="btn btn-warning btn-sm me-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#brandModal"
-                                        onClick={() => openEdit(b.id, b.name)}
-                                    >
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        className="btn btn-danger btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal"
-                                        onClick={() => setDeleteId(b.id)}
-                                    >
-                                        Delete
-                                    </button>
+            <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                    <thead className="table-dark">
+                        <tr>
+                            <th>Brand Name</th>
+                            <th className="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loading && data.length === 0 ? (
+                            <tr>
+                                <td colSpan={2} className="text-center py-4">
+                                    <div className="spinner-border text-primary" />
                                 </td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-
-            <div className="d-flex justify-content-between">
-                <button
-                    className="btn btn-outline-primary"
-                    disabled={!pagination?.hasPreviousPage()}
-                    onClick={() => setPageIndex(currentPage - 1)}
-                >
-                    Prev
-                </button>
-
-                <span>
-                    Page {currentPage} / {totalPage}
-                </span>
-
-                <button
-                    className="btn btn-outline-primary"
-                    disabled={!pagination?.hasNextPage()}
-                    onClick={() => setPageIndex(currentPage + 1)}
-                >
-                    Next
-                </button>
+                        ) : data.length === 0 ? (
+                            <tr>
+                                <td colSpan={2} className="text-center py-4 text-muted">
+                                    No brands found
+                                </td>
+                            </tr>
+                        ) : (
+                            data.map((brand) => (
+                                <tr key={brand.id}>
+                                    <td>{brand.name}</td>
+                                    <td className="text-center">
+                                        <button
+                                            className="btn btn-warning btn-sm me-2"
+                                            onClick={() => openEditModal(brand)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="btn btn-danger btn-sm"
+                                            onClick={() => openDeleteConfirm(brand)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
 
-            <div className="modal fade" id="brandModal">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">
-                                {editingId ? "Edit Brand" : "Create Brand"}
-                            </h5>
-                            <button className="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <div className="modal-body">
-                            <input
-                                className="form-control"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" data-bs-dismiss="modal">
-                                Cancel
+            {pagination && totalPages > 1 && (
+                <nav>
+                    <ul className="pagination justify-content-center">
+                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => setPageIndex(currentPage - 1)}
+                            >
+                                Previous
                             </button>
-                            <button className="btn btn-primary" onClick={handleSubmit}>
-                                Save
+                        </li>
+
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <li
+                                key={page}
+                                className={`page-item ${page === currentPage ? "active" : ""}`}
+                            >
+                                <button
+                                    className="page-link"
+                                    onClick={() => setPageIndex(page)}
+                                >
+                                    {page}
+                                </button>
+                            </li>
+                        ))}
+
+                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => setPageIndex(currentPage + 1)}
+                            >
+                                Next
                             </button>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
+                </nav>
+            )}
+
+            <CommonModal
+                show={showBrandModal}
+                onHide={() => setShowBrandModal(false)}
+                title={editingBrand ? "Edit Brand" : "Create New Brand"}
+                onSave={handleSaveBrand}
+                saveText={editingBrand ? "Update" : "Create"}
+                loading={loading}
+                backdrop="static"
+            >
+                <div className="mb-3 d-flex flex-column align-items-start">
+                    <label className="form-label fw-bold">
+                        Brand Name <span className="text-danger">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={brandName}
+                        onChange={(e) => setBrandName(e.target.value)}
+                        placeholder="Enter brand name"
+                        required
+                    />
                 </div>
-            </div>
+            </CommonModal>
 
-            <div className="modal fade" id="deleteModal">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">Confirm Delete</h5>
-                            <button className="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <div className="modal-body">
-                            Are you sure you want to delete this brand?
-                        </div>
-
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" data-bs-dismiss="modal">
-                                Cancel
-                            </button>
-                            <button className="btn btn-danger" onClick={handleDelete}>
-                                Delete
-                            </button>
-                        </div>
-                    </div>
+            <CommonModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                title="Confirm Delete"
+                onSave={handleDeleteBrand}
+                saveText="Delete"
+                saveVariant="danger"
+                loading={loading}
+                backdrop="static"
+            >
+                <div className="text-center py-3 ">
+                    <p className="fs-5 mb-1">
+                        Are you sure you want to delete the brand:
+                    </p>
+                    <p className="fw-bold text-danger">
+                        "{deletingBrand?.name}"
+                    </p>
+                    <p className="text-muted small">
+                        This action cannot be undone.
+                    </p>
                 </div>
-            </div>
+            </CommonModal>
         </div>
     );
 }

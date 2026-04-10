@@ -1,10 +1,11 @@
 import { BrandController } from "../controller/brand-controller";
-import type { BrandUpdateDTO, BrandViewDTO } from "../dtos/brand-dto";
+import type { BrandCreateDTO, BrandUpdateDTO, BrandViewDTO } from "../dtos/brand-dto";
 import type { PaginationResult } from "@core/types/common";
 import { useEffect, useState, useCallback } from "react";
 
 export function useBrand() {
     const [pagination, setPagination] = useState<PaginationResult<BrandViewDTO> | null>(null);
+    const [allData, setAllData] = useState<PaginationResult<BrandViewDTO> | null>(null);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const pageSize = 10;
@@ -18,7 +19,6 @@ export function useBrand() {
                 pageIndex: pagination?.pageIndex ?? 1,
                 pageSize
             });
-
             setPagination(res);
 
         } catch (err) {
@@ -28,9 +28,24 @@ export function useBrand() {
         }
     }, [search, pagination?.pageIndex]);
 
+    const fetchAllData = useCallback(async () => {
+            try {
+                setLoading(true);
+    
+                const res = await BrandController.getBrands({});
+                setAllData(res);
+    
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }, []);
+
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+        fetchAllData();
+    }, [fetchAllData, fetchData]);
 
     const setPageIndex = (page: number) => {
         if (!pagination) return;
@@ -41,7 +56,7 @@ export function useBrand() {
         });
     };
 
-    const createBrand = async (payload: { name: string }) => {
+    const createBrand = async (payload: BrandCreateDTO) => {
         try {
             setLoading(true);
             await BrandController.createBrand(payload);
@@ -73,6 +88,7 @@ export function useBrand() {
 
     return {
         data: pagination?.data ?? [],
+        allBrand: allData,
         pagination,
         loading,
         search,

@@ -1,8 +1,9 @@
 
-import { ProductCreateApplicationDTO, toProductVariantApplicationDTO } from "../dtos/product-application-dto";
+import { ProductCreateApplicationDTO, ProductDetailDTO, ProductUpdateApplicationDTO, toProductVariantApplicationDTO } from "../dtos/product-application-dto";
 import IProductVariantService from "../services/iproduct-variant-service";
 import IProductApplication from "./iproduct-application";
 import IProductService from '../services/iproduct-service';
+import { ProductUpdateDTO } from "../dtos/product-dto";
 
 export default class ProductApplication implements IProductApplication {
     private productService: IProductService;
@@ -12,21 +13,48 @@ export default class ProductApplication implements IProductApplication {
         this.productService = productService;
         this.productVariantService = productVariantService;
     }
-    async createProductApplication(value: ProductCreateApplicationDTO): Promise<string> {
-        const product = await this.productService.createProduct(value.product);
-        const variantDTO = toProductVariantApplicationDTO(product.id, value.variant);
-        variantDTO.map(async v => {
-            await this.productVariantService.addProductVariant(v);
+    async updateAsync(value: ProductUpdateApplicationDTO): Promise<string> {
+        if (value.product) {
+            if (!value.product.id) {
+                Promise.reject("Id sản phẩm không được để trống");
+            }
+            await this.productService.updateAsync(value.product as ProductUpdateDTO);
+        }
+        value.variants?.forEach(async variant => {
+            if (variant.id) {
+                Promise.reject("Id biến thể sản phẩm không được để trống");
+            }
+            await this.productVariantService.updateAsync(variant);
+        });
+        return "Cập nhật thành công";
+    }
+
+    async deleteAsync(id: string): Promise<string> {
+        const isDeleteProduct = await this.productService.deleteAsync(id);
+        if (!isDeleteProduct) {
+            return Promise.reject("Không xóa được sản phẩm");
+        }
+        const isDeleteVariants = await this.productVariantService.deleteByProductIdAsync(id);
+        if (!isDeleteVariants) {
+            return Promise.reject("Không xóa được các biến thể của sản phẩm");
+        }
+        return Promise.resolve("Xóa sản phẩm thành công");
+    }
+    async createAsync(value: ProductCreateApplicationDTO): Promise<string> {
+        const product = await this.productService.createAsync(value.product);
+        const variantDTOs = toProductVariantApplicationDTO(product.id, value.variants);
+        variantDTOs.map(async v => {
+            await this.productVariantService.addAsync(v);
         });
         return Promise.resolve("Tạo thành công");
     }
 
-    async getProductDetail(id: string): Promise<ProductCreateApplicationDTO> {
-        const product = await this.productService.getProductById(id);
-        const variant = await this.productVariantService.getVariantByProductId(product.id);
+    async getByIdAsync(id: string): Promise<ProductDetailDTO> {
+        const product = await this.productService.getByIdAsync(id);
+        const variants = await this.productVariantService.getByProductIdAsync(product.id);
         return {
             product,
-            variant
+            variants
         }
     }
 }

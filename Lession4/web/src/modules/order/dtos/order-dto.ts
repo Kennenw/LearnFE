@@ -20,6 +20,19 @@ export interface OrderCreateDTO {
     shippingAddress?: string;
 }
 
-export interface OrderUpdateDTO extends Partial<Omit<Order, 'id' | 'customerId'>> {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface OrderUpdateDTO extends Partial<Omit<Order, 'customerId'>> {
 
+}
+
+export function toOrderViewDTO(value: Order): OrderViewDTO {
+    return {
+        id: value.id,
+        customerId: value.customerId,
+        orderDate: value.orderDate,
+        totalAmount: value.totalAmount,
+        totalPrice: 0,
+        status: value.status,
+        shippingAddress: value.shippingAddress ?? ""
+    }
 }

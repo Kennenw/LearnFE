@@ -2,7 +2,7 @@ import { Role, UserStatus } from "@core/enum/user";
 import IGenericRepository from "@core/interfaces/igeneric-repository";
 import { PaginationResult } from "@core/types/common";
 import { Pagination } from "@core/utils/pagination";
-import { toUserViewDTO, UserCreateDTO, UserUpdateDTO, UserViewDTO } from "../dtos/user-dto";
+import { toUserViewDTO, UserCreateDTO, UserPaginationQuery, UserUpdateDTO, UserViewDTO } from "../dtos/user-dto";
 import User from "../models/user";
 import IUserService from "./iuser-service";
 
@@ -12,22 +12,22 @@ export default class UserService implements IUserService {
     constructor(userRepo: IGenericRepository<User>) {
         this.userRepo = userRepo;
     }
-    
-    async banUser(id: string): Promise<boolean> {
-        const user = await this.getUserById(id);
-        user.status = UserStatus.BANNED;
-        await this.userRepo.editAsync(id, user);
+    async deleteAsync(id: string): Promise<boolean> {
+        await this.getByIdAsync(id);
+        await this.userRepo.removeAsync(id);
         return true;
     }
-    async unBanUser(id: string): Promise<boolean> {
-        const user = await this.getUserById(id);
-        user.status = UserStatus.ACTIVE;
+
+    async changeStatusAsync(id: string, status: UserStatus): Promise<boolean> {
+        const user = await this.getByIdAsync(id);
+        user.status = status;
         await this.userRepo.editAsync(id, user);
         return true;
 
     }
-    async decentralize(id: string, role: Role): Promise<boolean> {
-        const user = await this.getUserById(id);
+
+    async changeRoleAsync(id: string, role: Role): Promise<boolean> {
+        const user = await this.getByIdAsync(id);
         if (user.status === UserStatus.BANNED) {
             return Promise.reject(Error('Người dùng này đang bị ban'));
         }
@@ -36,7 +36,7 @@ export default class UserService implements IUserService {
         return true;
     }
 
-    async createUser(value: UserCreateDTO): Promise<string> {
+    async createAsync(value: UserCreateDTO): Promise<string> {
         const newUser = new User(value.userName, value.password);
         newUser.role = value.role;
         newUser.status = value.status;
@@ -44,19 +44,22 @@ export default class UserService implements IUserService {
         await this.userRepo.addAsync(newUser);
         return "Tạo người dùng thành công";
     }
-    async updateUser(id: string, value: UserUpdateDTO): Promise<string> {
+    async updateAsync(id: string, value: UserUpdateDTO): Promise<string> {
         await this.userRepo.getByIdAsync(id);
         await this.userRepo.editAsync(id, value);
         return "Cập người dùng thành công";
     }
-    async getUser(search?: string, pageIndex?: number, pageSize?: number): Promise<PaginationResult<UserViewDTO>> {
-        const users = await this.userRepo.getAsync(pageIndex, pageSize, (b) => {
-            return b.select('*').ilike('name', `%${search}%`);
+    async getAsync(query: UserPaginationQuery): Promise<PaginationResult<UserViewDTO>> {
+        const users = await this.userRepo.getAsync(query.pageIndex, query.pageSize, (queryDB) => {
+            let querySearch = queryDB.select('*').neq('role', Role.OWNER);
+            if (query.search) {
+                querySearch = querySearch.ilike('name', `%${query.search}%`);
+            }
+            return querySearch;
         });
-        return Pagination<UserViewDTO>(users.data.map(u => toUserViewDTO(u)), users.count, pageSize, pageIndex);
-
+        return Pagination<UserViewDTO>(users.data.map(u => toUserViewDTO(u)), users.count, query.pageSize, query.pageIndex);
     }
-    async getUserById(id: string): Promise<UserViewDTO> {
+    async getByIdAsync(id: string): Promise<UserViewDTO> {
         const user = await this.userRepo.getByIdAsync(id);
         if (!user) {
             return Promise.reject(Error('Người dùng không tồn tại'));

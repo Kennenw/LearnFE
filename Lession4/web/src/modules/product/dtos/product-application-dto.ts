@@ -1,14 +1,19 @@
-import { ProductCreateDTO, ProductViewDTO } from "./product-dto";
-import { ProductVariantAddDTO, ProductVariantViewDTO } from "./product-variant-dto";
+import { ProductCreateDTO, ProductUpdateDTO, ProductViewDTO } from "./product-dto";
+import { ProductVariantAddDTO, ProductVariantUpdateDTO, ProductVariantViewDTO } from "./product-variant-dto";
 
 export interface ProductDetailDTO {
     product: ProductViewDTO,
-    variant: ProductVariantViewDTO[]
+    variants: ProductVariantViewDTO[]
 }
 
 export interface ProductCreateApplicationDTO {
     product: ProductCreateDTO,
-    variant: ProductVariantAddDTO[]
+    variants: ProductVariantAddDTO[]
+}
+
+export interface ProductUpdateApplicationDTO {
+    product?: Partial<ProductUpdateDTO>,
+    variants?: Partial<ProductVariantUpdateDTO>[]
 }
 
 export function toProductVariantApplicationDTO(productId: string, variants: ProductVariantAddDTO[]): ProductVariantAddDTO[] {

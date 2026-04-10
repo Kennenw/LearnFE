@@ -2,8 +2,9 @@ import { PaginationResult } from '../../../core/types/common';
 import { OrderCreateDTO, OrderUpdateDTO, OrderViewDTO } from "../dtos/order-dto";
 
 export default interface IOrderService {
-    createOrder(value: OrderCreateDTO): Promise<string>;
-    getOrderById(id: string): Promise<PaginationResult<OrderViewDTO>>;
-    updateOrder(id: string, value: OrderUpdateDTO): Promise<string>;
-    deleteOrder(id: string): Promise<string>;
+    createAsync(value: OrderCreateDTO): Promise<string>;
+    getByIdAsync(id: string): Promise<OrderViewDTO | undefined>;
+    updateAsync(value: OrderUpdateDTO): Promise<boolean>;
+    deleteAsync(id: string): Promise<boolean>;
+    getByUserIdAsync(id: string): Promise<PaginationResult<OrderViewDTO>>;
 }
