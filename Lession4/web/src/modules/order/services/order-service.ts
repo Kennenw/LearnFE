@@ -1,8 +1,8 @@
-import { PaginationResult } from "../../../core/types/common";
-import { OrderCreateDTO, OrderViewDTO, OrderUpdateDTO, toOrderViewDTO } from "../dtos/order-dto";
+import { PaginationResult } from "@core/types/common";
+import { OrderCreateDTO, OrderViewDTO, OrderUpdateDTO, toOrderViewDTO, OrderPaginationQuery } from "../dtos/order-dto";
 import Order from "../models/order";
 import IOrderService from "./iorder-service";
-import IGenenricRepository from "../../../core/interfaces/igeneric-repository";
+import IGenenricRepository from "@core/interfaces/igeneric-repository";
 import { Pagination } from "@core/utils/pagination";
 
 export default class OrderService implements IOrderService {
@@ -13,8 +13,8 @@ export default class OrderService implements IOrderService {
     }
 
     async createAsync(value: OrderCreateDTO): Promise<string> {
-        const id = await this.orderRepo.addAsync(value as unknown as Order);
-        return "";
+        const order = await this.orderRepo.addAsync(value as unknown as Order) as Order;
+        return order.id;
     }
 
     async getByIdAsync(id: string): Promise<OrderViewDTO | undefined> {
@@ -52,5 +52,23 @@ export default class OrderService implements IOrderService {
         })
         const result = orders.data.map(order => toOrderViewDTO(order));
         return Pagination(result, orders.count);
+    }
+
+    async getAsync(query: OrderPaginationQuery): Promise<PaginationResult<OrderViewDTO>> {
+        const orders = await this.orderRepo.getAsync(query.pageIndex, query.pageSize, queryDB => {
+            let querySearch = queryDB.select('*');
+            if (query.search) {
+                querySearch = querySearch.ilike('shippingAddress', `%${query.search}%`);
+            }
+            if (query.status) {
+                querySearch = querySearch.eq('status', query.status);
+            }
+            if (query.customerId) {
+                querySearch = querySearch.eq('customerId', query.customerId);
+            }
+            return querySearch.order('orderDate', { ascending: false });
+        });
+        const result = orders.data.map(toOrderViewDTO);
+        return Pagination(result, orders.count, query.pageSize, query.pageIndex);
     }
 }

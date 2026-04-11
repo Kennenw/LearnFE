@@ -5,30 +5,24 @@ import { useCart } from "@modules/order/hooks/use-cart";
 import { useState } from "react";
 
 export default function ShopPage() {
-    const { 
-        data: products, 
-        loading: productsLoading, 
-        search, 
-        setSearch 
+    const {
+        data: products,
+        loading: productsLoading,
+        search,
+        setSearch
     } = useProduct();
     const { addToCart } = useCart();
     const [addingId, setAddingId] = useState<string | null>(null);
-    
+
     const activeProducts = products.filter(p => p.status === ProductStatus.ACTIVE);
 
     const handleQuickAddToCart = async (e: React.MouseEvent, product: any) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         setAddingId(product.id);
-        
+
         try {
-            // Pick a default variant (we'd ideally fetch variants, but for "quick" add we might need them pre-loaded or just use first)
-            // Since product list doesn't include variants, we take them to detail if we want selection, 
-            // BUT if we want "direct add", we'd need to fetch them.
-            // Let's assume for now clicking Add takes them to detail OR we pick a placeholder.
-            // Most modern shops require selection.
-            // I'll update the button to say "View" if selection is needed, or just redirect.
             window.location.href = `/shop/product/${product.id}`;
         } finally {
             setTimeout(() => setAddingId(null), 500);
@@ -41,7 +35,7 @@ export default function ShopPage() {
                 <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 small fw-bold">Premium Selection</span>
                 <h1 className="display-5 fw-bold mb-3" style={{ letterSpacing: '-1.5px' }}>Discover Quality Products</h1>
                 <p className="text-muted mb-5 mx-auto" style={{ maxWidth: '600px' }}>Our curated collection brings you the best in design and performance.</p>
-                
+
                 <div className="col-md-7 mx-auto">
                     <div className="input-group card-modern rounded-pill overflow-hidden border-0 shadow-lg ps-4 p-1">
                         <span className="input-group-text bg-white border-0 ps-3">
@@ -85,10 +79,10 @@ export default function ShopPage() {
                                             <span className="small text-muted">{product.brandName}</span>
                                         </div>
                                         <h6 className="fw-bold mb-3 line-clamp-2" style={{ lineHeight: '1.4', fontSize: '1.1rem' }}>{product.name}</h6>
-                                        
+
                                         <div className="mt-auto pt-3 d-flex align-items-center justify-content-between border-top">
                                             <div className="fw-bold fs-5 text-dark">Price Tag</div>
-                                            <button 
+                                            <button
                                                 className="btn btn-modern btn-modern-outline btn-sm py-2 px-3 rounded-pill"
                                                 onClick={(e) => handleQuickAddToCart(e, product)}
                                             >

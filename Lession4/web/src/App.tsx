@@ -16,6 +16,8 @@ import ProductDetailPage from '@modules/product/pages/product-detail-page';
 import ShopPage from '@modules/product/pages/shop-page';
 import CartPage from '@modules/product/pages/cart-page';
 import ProductCustomerDetailPage from '@modules/product/pages/product-customer-detail-page';
+import OrderManagerPage from '@modules/order/pages/order-manager-page';
+import UserOrderPage from '@modules/order/pages/user-order-page';
 import { useCart } from '@modules/order/hooks/use-cart';
 
 function CustomerNav({ userName, onLogout, cartCount }: { userName: string | null, onLogout: () => void, cartCount: number }) {
@@ -48,7 +50,7 @@ function CustomerNav({ userName, onLogout, cartCount }: { userName: string | nul
                             <li><div className="px-3 py-2 small fw-bold text-muted text-uppercase" style={{ fontSize: '10px' }}>Authenticated as</div></li>
                             <li><div className="px-3 pb-2 fw-bold text-dark">{userName || 'Guest'}</div></li>
                             <li><hr className="dropdown-divider opacity-50" /></li>
-                            <li><Link className="dropdown-item rounded-3 py-2 small" to="/cart"><i className="bi bi-bag me-2"></i>My Orders</Link></li>
+                            <li><Link className="dropdown-item rounded-3 py-2 small" to="/my-orders"><i className="bi bi-bag me-2"></i>My Orders</Link></li>
                             <li><button className="dropdown-item rounded-3 py-2 small text-danger" onClick={onLogout}><i className="bi bi-box-arrow-right me-2"></i>Sign Out</button></li>
                         </ul>
                     </div>
@@ -89,6 +91,9 @@ function Sidebar({ role, userName, onLogout }: { role: Role | null, userName: st
                 </Link>
                 <Link className={`sidebar-link ${location.pathname === '/brands' ? 'active' : ''}`} to="/brands">
                     <i className="bi bi-patch-check"></i> Brands
+                </Link>
+                <Link className={`sidebar-link ${location.pathname.startsWith('/orders') ? 'active' : ''}`} to="/orders">
+                    <i className="bi bi-cart-check"></i> Orders
                 </Link>
 
                 {role === Role.OWNER && (
@@ -210,6 +215,7 @@ function App() {
                         <Route path="/shop" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
                         <Route path="/shop/product/:id" element={<PrivateRoute><ProductCustomerDetailPage /></PrivateRoute>} />
                         <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+                        <Route path="/my-orders" element={<PrivateRoute><UserOrderPage /></PrivateRoute>} />
                         
                         <Route path="/users" element={<PrivateRoute allowedRoles={[Role.OWNER]}><UserPage /></PrivateRoute>} />
                         <Route path="/brands" element={<PrivateRoute allowedRoles={[Role.OWNER, Role.STAFF]}><BrandPage /></PrivateRoute>} />
@@ -218,6 +224,7 @@ function App() {
                         <Route path="/products/create" element={<PrivateRoute allowedRoles={[Role.OWNER, Role.STAFF]}><ProductFormPage /></PrivateRoute>} />
                         <Route path="/products/edit/:id" element={<PrivateRoute allowedRoles={[Role.OWNER, Role.STAFF]}><ProductFormPage /></PrivateRoute>} />
                         <Route path="/products/:id" element={<PrivateRoute allowedRoles={[Role.OWNER, Role.STAFF]}><ProductDetailPage /></PrivateRoute>} />
+                        <Route path="/orders" element={<PrivateRoute allowedRoles={[Role.OWNER, Role.STAFF]}><OrderManagerPage /></PrivateRoute>} />
 
                         <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/login"} replace />} />
                     </Routes>

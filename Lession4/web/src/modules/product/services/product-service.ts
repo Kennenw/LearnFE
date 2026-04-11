@@ -1,21 +1,15 @@
 import { Sort } from "@core/enum/common";
 import IGenericRepository from "@core/interfaces/igeneric-repository";
 import { PaginationResult } from "@core/types/common";
-import Brand from "../../brand/models/brand";
-import Category from "../../category/models/category";
 import { ProductCreateDTO, ProductViewDTO, ProductUpdateDTO, toProductViewDTO, ProductPaginationQuery } from "../dtos/product-dto";
 import Product from "../models/product";
 import IProductService from "./iproduct-service";
 import { Pagination } from '@core/utils/pagination';
 
 export default class ProductService implements IProductService {
-    private brandRepo: IGenericRepository<Brand>;
-    private categoryRepo: IGenericRepository<Category>;
     private productRepo: IGenericRepository<Product>;
 
-    constructor(brandRepo: IGenericRepository<Brand>, categoryRepo: IGenericRepository<Category>, productRepo: IGenericRepository<Product>) {
-        this.brandRepo = brandRepo;
-        this.categoryRepo = categoryRepo;
+    constructor(productRepo: IGenericRepository<Product>) {
         this.productRepo = productRepo;
     }
 
@@ -27,47 +21,33 @@ export default class ProductService implements IProductService {
 
     async getAsync(query: ProductPaginationQuery): Promise<PaginationResult<ProductViewDTO>> {
         const products = await this.productRepo.getAsync(query.pageIndex, query.pageSize, queryDB => {
-            let querySearch = queryDB.select(`*, product_variants(price), categories(*), brands(*)`);
+            let querySearch = queryDB.select(`*, categories(*), brands(*)`);
             if (queryDB.search) {
-                querySearch.ilike('name', `%${query.search}%`);
+                querySearch = querySearch.ilike('name', `%${query.search}%`);
             }
             if (query.categoryId) {
-                querySearch.eq('categoryId', query.categoryId);
+                querySearch = querySearch.eq('categoryId', query.categoryId);
             }
             if (query.brandId) {
-                querySearch.eq('brandId', query.brandId);
-            }
-            if (query.sortByPrice) {
-                querySearch = querySearch.order("product_variants.price", { ascending: query.sortByPrice === Sort.ASC });
+                querySearch = querySearch.eq('brandId', query.brandId);
             }
             return querySearch;
         });
-        const result = await Promise.all(products.data.map(async product => {
-            return toProductViewDTO(product, product.categories as Category, product.brands as Brand);
-        }));
+        const result = products.data.map(toProductViewDTO);
         return Pagination(result, products.count, query.pageSize, query.pageIndex);
     }
 
     async updateAsync(value: ProductUpdateDTO): Promise<string> {
-        await this.productRepo.getByIdAsync(value.id);
         await this.productRepo.editAsync(value.id, value);
         return Promise.resolve("Cập nhật sản phẩm thành công");
     }
 
     async getByIdAsync(id: string): Promise<ProductViewDTO> {
-        const product = await this.productRepo.getByIdAsync(id);
-        if (!product) {
-            return Promise.reject(new Error("Sản phẩm không tồn tại"));
-        }
-        const brand = await this.brandRepo.getByIdAsync(product.brandId);
-        if (!brand) {
-            return Promise.reject(new Error("Hãng không tồn tại"));
-        }
-        const category = await this.categoryRepo.getByIdAsync(product.categoryId);
-        if (!category) {
-            return Promise.reject(new Error("Danh mục sản phẩm không tồn tại"));
-        }
-        return toProductViewDTO(product, category, brand);
+        const product = await this.productRepo.getAsync(undefined, undefined, queryDB => {
+            return queryDB.select(`*, categories(*), brands(*)`)
+                .eq('id', id);
+        });
+        return toProductViewDTO(product.data[0]);
     }
 
     async deleteAsync(id: string): Promise<boolean> {

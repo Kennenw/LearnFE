@@ -20,12 +20,14 @@ export default class ProductApplication implements IProductApplication {
             }
             await this.productService.updateAsync(value.product as ProductUpdateDTO);
         }
-        value.variants?.forEach(async variant => {
-            if (variant.id) {
-                Promise.reject("Id biến thể sản phẩm không được để trống");
-            }
-            await this.productVariantService.updateAsync(variant);
-        });
+        if (value.variants) {
+            await Promise.all(value.variants.map(async variant => {
+                if (!variant.id) {
+                    throw new Error("Id biến thể sản phẩm không được để trống");
+                }
+                await this.productVariantService.updateAsync(variant);
+            }));
+        }
         return "Cập nhật thành công";
     }
 
@@ -43,9 +45,7 @@ export default class ProductApplication implements IProductApplication {
     async createAsync(value: ProductCreateApplicationDTO): Promise<string> {
         const product = await this.productService.createAsync(value.product);
         const variantDTOs = toProductVariantApplicationDTO(product.id, value.variants);
-        variantDTOs.map(async v => {
-            await this.productVariantService.addAsync(v);
-        });
+        await Promise.all(variantDTOs.map(v => this.productVariantService.addAsync(v)));
         return Promise.resolve("Tạo thành công");
     }
 

@@ -1,6 +1,3 @@
-import Product from "../models/product";
-import Category from "../../category/models/category";
-import Brand from "../../brand/models/brand";
 import { ProductStatus } from "@core/enum/product";
 import { PaginationQuery } from "@core/types/common";
 import { Sort } from "@core/enum/common";
@@ -17,9 +14,8 @@ export interface ProductViewDTO {
 }
 
 export interface ProductPaginationQuery extends PaginationQuery {
-    categoryId?: string; 
-    brandId?: string; 
-    sortByPrice?: Sort;
+    categoryId?: string;
+    brandId?: string;
 }
 
 export interface ProductCreateDTO {
@@ -34,15 +30,15 @@ export interface ProductUpdateDTO extends Partial<ProductCreateDTO> {
     id: string;
 }
 
-export function toProductViewDTO(product: Product, category: Category, brand: Brand): ProductViewDTO {
+export function toProductViewDTO(product: any): ProductViewDTO {
     return {
         id: product.id,
         name: product.name,
         description: product.description,
         categoryId: product.categoryId,
-        categoryName: category.name,
+        categoryName: product.categories.name,
         brandId: product.brandId,
-        brandName: brand.name,
+        brandName: product.brands.name,
         status: product.status
-    }
+    };
 }

@@ -1,5 +1,5 @@
-import { OrderStatus } from "../../../core/enum/order";
-import BaseEntity from "../../../core/base/base-entity";
+import { OrderStatus } from "@core/enum/order";
+import BaseEntity from "@core/base/base-entity";
 
 export default class Order extends BaseEntity {
     customerId: string;

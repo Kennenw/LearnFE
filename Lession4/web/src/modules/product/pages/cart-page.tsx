@@ -17,12 +17,19 @@ export default function CartPage() {
 
         try {
             await createOrder({
-                customerId: userId,
-                orderDate: new Date(),
-                status: OrderStatus.PENDING,
-                totalAmount: totalCount,
-                totalPrice: totalPrice,
-                shippingAddress: address.trim()
+                order: {
+                    customerId: userId,
+                    orderDate: new Date(),
+                    status: OrderStatus.PENDING,
+                    totalAmount: totalCount,
+                    totalPrice: totalPrice,
+                    shippingAddress: address.trim()
+                },
+                details: cartItems.map(item => ({
+                    productVariantId: item.variantId,
+                    quantity: item.quantity,
+                    price: item.price
+                }))
             });
             alert("Order placed!");
             clearCart();

@@ -1,4 +1,4 @@
-import { PaginationResult } from "../../../core/types/common";
+import { PaginationResult } from "@core/types/common";
 import { OrderDetailCreateDTO, OrderDetailUpdateDTO, OrderDetailViewDTO } from "../dtos/order-detail-dto";
 
 export default interface IOrderDetailService {

@@ -12,7 +12,10 @@ export interface CartItem {
 }
 
 export function useCart() {
-    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+        const savedCart = localStorage.getItem("cart");
+        return savedCart ? JSON.parse(savedCart) : [];
+    });
 
     const loadCart = useCallback(() => {
         const savedCart = localStorage.getItem("cart");

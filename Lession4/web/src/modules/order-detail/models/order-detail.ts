@@ -1,4 +1,4 @@
-import BaseEntity from "../../../core/base/base-entity";
+import BaseEntity from "@core/base/base-entity";
 
 export default class OrderDetail extends BaseEntity {
     orderId: string;

@@ -46,13 +46,14 @@ export default class GenericRepository<T> implements IGenericRepository<T> {
 
     async addAsync(data: T[] | T): Promise<T[] | T> {
         const arrData = Array.isArray(data) ? data : [data];
-        const { error } = await supabase
+        const { data: result, error } = await supabase
             .from(this.tableName)
-            .insert(arrData);
+            .insert(arrData)
+            .select();
         if (error) {
-            return Promise.reject(Error(`Error saving data: ${error}`));
+            return Promise.reject(Error(`Error saving data: ${error.message}`));
         }
-        return data;
+        return Array.isArray(data) ? (result as T[]) : (result![0] as T);
     }
 
     async removeAsync(id: string): Promise<void> {

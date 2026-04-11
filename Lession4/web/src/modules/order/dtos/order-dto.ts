@@ -1,5 +1,5 @@
-import { OrderStatus } from "../../../core/enum/order";
-import Order from "../models/order";
+import { OrderStatus } from "@core/enum/order";
+import { PaginationQuery } from "@core/types/common";
 
 export interface OrderViewDTO {
     id: string;
@@ -11,6 +11,11 @@ export interface OrderViewDTO {
     shippingAddress: string;
 }
 
+export interface OrderPaginationQuery extends PaginationQuery {
+    status?: OrderStatus;
+    customerId?: string;
+}
+
 export interface OrderCreateDTO {
     customerId: string;
     orderDate: Date;
@@ -20,12 +25,15 @@ export interface OrderCreateDTO {
     shippingAddress?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface OrderUpdateDTO extends Partial<Omit<Order, 'customerId'>> {
-
+export interface OrderUpdateDTO {
+    id: string;
+    status?: OrderStatus;
+    shippingAddress?: string;
+    totalAmount?: number;
+    totalPrice?: number;
 }
 
-export function toOrderViewDTO(value: Order): OrderViewDTO {
+export function toOrderViewDTO(value: any): OrderViewDTO {
     return {
         id: value.id,
         customerId: value.customerId,
