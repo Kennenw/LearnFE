@@ -3,7 +3,7 @@
 
 Trục tọa độ là hệ quy chiếu để biểu diễn position, rotation, scale của node trong không gian như local, world.
 
-## Có 2 hệ trục tọa độ
+### Có 2 hệ trục tọa độ
 
 ### Cartesian Coordinate (World / OpenGL)
 
@@ -95,7 +95,7 @@ Cocos dùng hệ tọa độ 3D theo quy ước:
 - Trong 3D, Z tăng dần hướng ra khỏi màn hình (forward)
 - Tùy camera mà có thể nhìn theo hướng -Z hoặc +Z
 
-## World Space & Local Space
+### World Space & Local Space
 
 ### World space
 - Là hệ tọa độ toàn cục của toàn bộ scene/game, nơi mà mọi node đều được quy về để render và tính toán.
@@ -104,14 +104,14 @@ Cocos dùng hệ tọa độ 3D theo quy ước:
 - Là hệ tọa độ riêng của 1 node, được tính so với parent của nó.
 - Gốc của local space nằm tại Anchor Point của node
 
-## Rotation
+### Rotation
 
 - Xoay hệ trục local của node quanh anchor
 - Không đổi local Position nhưng có thể làm thay đổi world Position của child
 - Nó thay đổi hướng của hệ trục local
 - Ảnh hưởng luôn tới child nodes
 
-## Anchor 
+### Anchor 
 
 Anchor là điểm neo trong không gian local (0 → 1)
 
@@ -122,11 +122,11 @@ Nó ảnh hưởng:
 - Position (cách node “bám” vào parent)
 
 
-## Transform System
+### Transform System
 
 Engine runtime của Cocos định nghĩa các hệ quy chiếu (Local space, World space, etc) và quản lý cách biến đổi giữa chúng, nó dùng Transform System để tự động tính các position, rotation, scale và chuyển tự động vị trí local theo world.
 
-## Parent - Child & Local Axis
+### Parent - Child & Local Axis
 
 Toàn bộ hệ tọa độ phụ thuộc vào cấu trúc parent-child:
 
@@ -134,7 +134,7 @@ Toàn bộ hệ tọa độ phụ thuộc vào cấu trúc parent-child:
 - Child node nằm trong local space của parent
 → Khi parent transform (move / rotate / scale) thì child cũng bị ảnh hưởng theo
 
-## Nguyên lý hoạt động
+### Nguyên lý hoạt động
 
 Nguyên lý hoạt động là nó không lưu 1 vị trí duy nhất:
 
@@ -148,7 +148,7 @@ World position chỉ được tính khi cần.
 
 Thay vào đó mỗi node có 1 tọa độ local, rồi engine dùng matrix transform để tự tính world transform.
 
-## Công thức Matrix Transform
+### Công thức Matrix Transform
     WorldMatrix = ParentWorldMatrix * LocalMatrix
 
 Trong đó:
@@ -157,11 +157,11 @@ Trong đó:
 
 # 2.1 AutoAtlas
 
-## Khái niệm
+### Khái niệm
 
 AutoAtlas là một phương pháp/ công cụ đóng gói ảnh trong phát triển game.
 
-## Thuật toán
+### Thuật toán
 
 Thường dùng thuật toán dạng Rectangle Packing, phổ biến nhất là biến thể của MaxRects algorithm.
 
@@ -173,21 +173,21 @@ Thường dùng thuật toán dạng Rectangle Packing, phổ biến nhất là 
 - Tối ưu diện tích sử dụng
 
 
-## Chức năng
+### Chức năng
 
 Tự động kết hợp các ảnh nhỏ đơn lẻ thành 1 ảnh lớn được gọi là:
 
 - Sprite Sheet
 - hoặc Texture Atlas
 
-## Mục đích
+### Mục đích
 
 Giảm số lần Draw calls  
 (là các chỉ thị từ CPU đến GPU yêu cầu hiển thị một đối tượng lên màn hình thông qua các API đồ họa. Trong cocos là OpenGL)
 
 → Tối ưu hiệu suất game
 
-## Cách hoạt động
+### Cách hoạt động
 
 ### 1. Đóng gói ảnh
 - Gom nhiều ảnh nhỏ thành 1 atlas
@@ -212,7 +212,7 @@ Giảm số lần Draw calls
 
 # 2.2 Texture Atlas & Power of Two (POT)
 
-## Power of Two (POT)
+### Power of Two (POT)
 
 Power of Two là các số có dạng:
 
@@ -227,7 +227,7 @@ Ví dụ:
 
 ---
 
-## Lí do GPU sử dụng POT
+### Lí do GPU sử dụng POT
 
 GPU được thiết kế tối ưu cho các kích thước dạng POT vì:
 
@@ -246,7 +246,7 @@ Non-POT vẫn chạy được trên GPU hiện đại nhưng:
 - Một số GPU mobile cũ không hỗ trợ tốt
 ---
 
-## Texture Atlas
+### Texture Atlas
 
 Texture Atlas là một ảnh lớn chứa nhiều ảnh nhỏ (sprite).
 
@@ -256,7 +256,7 @@ Texture Atlas là một ảnh lớn chứa nhiều ảnh nhỏ (sprite).
 
 ---
 
-## Kích thước tối đa của Atlas
+### Kích thước tối đa của Atlas
 
 Kích thước tối đa phụ thuộc vào GPU:
 
@@ -268,7 +268,7 @@ Kích thước tối đa phụ thuộc vào GPU:
 
 ---
 
-## Lựa chọn kích thước Atlas
+### Lựa chọn kích thước Atlas
 
 ### Atlas nhỏ (512, 1024)
 Ưu điểm:
