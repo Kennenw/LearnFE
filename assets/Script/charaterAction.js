@@ -29,8 +29,14 @@ cc.Class({
         }
         if (this.moveX > 0) {
             this.node.setScale(0.5, 0.5);
+            if (this.node.scaleX > 0) {
+                this.label.node.setScale(1, 1);
+            }
         } else if (this.moveX < 0) {
             this.node.setScale(-0.5, 0.5);
+            if (this.node.scaleX < 0) {
+                this.label.node.setScale(-1, 1);
+            }
         }
     },
 
