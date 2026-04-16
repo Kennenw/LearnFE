@@ -1,4 +1,4 @@
-# 1. Label CacheMode trong Cocos Creator
+# 1. Label CacheMode
 
 ### Glyph là gì?
 
