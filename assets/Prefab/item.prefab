@@ -250,9 +250,7 @@
     "_fillStart": 0.5,
     "_fillRange": 1,
     "_isTrimmedMode": true,
-    "_atlas": {
-      "__uuid__": "fd49a255-4249-43f4-934e-be576418f8be"
-    },
+    "_atlas": null,
     "_id": ""
   },
   {
@@ -621,9 +619,7 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": {
-      "__uuid__": "fd49a255-4249-43f4-934e-be576418f8be"
-    },
+    "_atlas": null,
     "_id": ""
   },
   {
@@ -666,9 +662,7 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": {
-      "__uuid__": "fd49a255-4249-43f4-934e-be576418f8be"
-    },
+    "_atlas": null,
     "_id": ""
   },
   {
