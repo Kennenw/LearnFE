@@ -179,11 +179,6 @@ Cache ở mức **từng ký tự (glyph)**.
 ---   
 
 # 2. Life Cycle Callback
-
-## 1. Khái niệm
-
-### 1.1 Life Cycle Callback là gì?
-
 Life Cycle Callback là tập hợp các hàm đặc biệt được định nghĩa sẵn bởi engine Cocos Creator.
 
 Engine sử dụng cơ chế **Inversion of Control (IoC)**:
@@ -192,7 +187,7 @@ Engine sử dụng cơ chế **Inversion of Control (IoC)**:
 - Engine tự điều khiển thứ tự thực thi
 - Lập trình viên chỉ cần "hook" logic vào đúng các hàm tương ứng
 
-### 1.2 Lí do cần Life Cycle
+### Lí do cần Life Cycle
 
 Trong game:
 
@@ -205,16 +200,16 @@ Do đó, Life Cycle giúp:
 - Tránh bug do sai thứ tự logic
 - Tối ưu performance (tránh logic dư thừa, dọn rác đúng lúc)
 
-## 2. Vòng đời của Component
+## Vòng đời của Component
 
 Thứ tự lifecycle:
 
     onLoad → onEnable → start → update → lateUpdate → onDisable → onDestroy
 
-## 3.Từng giai đoạn
+## Từng giai đoạn
 
 
-### 3.1 onLoad — Khởi tạo (Initialization)
+### 1. onLoad — Khởi tạo (Initialization)
 
 #### Bản chất
 
@@ -243,7 +238,7 @@ Thứ tự lifecycle:
         this.player = cc.find("Canvas/Player");
     }
 
-### 3.2 onEnable — Khi component bật
+### 2. onEnable — Khi component bật
 
 **Bản chất**
 
@@ -267,7 +262,7 @@ onEnable() {
 }
 ```
 
-### 3.3 start — Runtime init
+### 3. start — Runtime init
 
 **Bản chất**
 
@@ -287,7 +282,7 @@ onEnable() {
 - Init biến runtime
 
 
-### 3.4 update(dt) — Game loop
+### 4. update(dt) — Game loop
 
 **Bản chất**
 
@@ -310,7 +305,7 @@ update(dt) {
 }
 ```
 
-### 3.5 lateUpdate(dt)
+### 5. lateUpdate(dt)
 
 **Bản chất**
 
@@ -326,7 +321,7 @@ Pattern:
 update() → xử lý  
 lateUpdate() → chỉnh cuối
 
-### 3.6 onDisable
+### 6. onDisable
 
 **Bản chất**
 
@@ -342,7 +337,7 @@ onDisable() {
    cc.systemEvent.off(...);
 }
 ```
-### 3.7 onDestroy
+### 7. onDestroy
 
 **Bản chất**
 
@@ -357,7 +352,7 @@ onDisable() {
 - Cleanup
 - Giải phóng memory
 
-## 4. Mapping vòng đời
+## Mapping vòng đời
 
 | Giai đoạn  | Ý nghĩa    |
 | ---------- | ---------- |
@@ -369,9 +364,9 @@ onDisable() {
 | onDisable  | Tạm dừng   |
 | onDestroy  | Hủy        |
 
-## 5. Tại sao phải dùng đúng lifecycle?
+## Tại sao phải dùng đúng lifecycle?
 
-### 5.1 Tránh bug
+#### Tránh bug
 
 Sai:
 
@@ -389,7 +384,7 @@ start() {
 onLoad();
 ```
 
-### 5.2 Performance
+#### Performance
 
 - update chạy ~60 FPS
 
@@ -398,14 +393,14 @@ Nguyên tắc:
 - Không logic nặng trong update
 - Không init trong update
 
-### 5.3 Maintainable
+####  Maintainable
 
 - Code rõ ràng
 - Dễ debug
 - Dễ scale
 
 
-## 6. Best Practices
+## Best Practices
 
 - onLoad → init static
 - start → init dynamic
