@@ -1,0 +1,33 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "Monster01",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 3.0166666666666666,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 22,
+  "curveData": {
+    "props": {
+      "position": [
+        {
+          "frame": 0,
+          "value": [
+            541.638,
+            -218.169,
+            0
+          ]
+        },
+        {
+          "frame": 3.0166666666666666,
+          "value": [
+            541.638,
+            209.353,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "events": []
+}
