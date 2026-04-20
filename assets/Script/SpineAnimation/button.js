@@ -5,7 +5,11 @@ cc.Class({
 
     onClick() {
         console.log("CLICK");
-        mEmitter.instance.emit('SET_ANIMATION', run);
-    }
+        mEmitter.instance.emit('SET_ANIMATION', this.node.getComponentInChildren(cc.Label).string);
+    },
+
+    start(){
+
+    },
 
 });

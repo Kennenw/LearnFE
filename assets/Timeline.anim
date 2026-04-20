@@ -1,0 +1,105 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "Timeline",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 2.2,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 22,
+  "curveData": {
+    "props": {
+      "position": [
+        {
+          "frame": 0,
+          "value": [
+            -683,
+            -263
+          ],
+          "motionPath": []
+        },
+        {
+          "frame": 0.9833333333333333,
+          "value": [
+            -343,
+            97
+          ],
+          "motionPath": []
+        },
+        {
+          "frame": 1.5,
+          "value": [
+            5,
+            92
+          ],
+          "motionPath": []
+        },
+        {
+          "frame": 1.75,
+          "value": [
+            313,
+            -224
+          ],
+          "motionPath": []
+        },
+        {
+          "frame": 2.2,
+          "value": [
+            600,
+            -270
+          ],
+          "motionPath": []
+        }
+      ],
+      "scale": [
+        {
+          "frame": 0,
+          "value": {
+            "__type__": "cc.Vec3",
+            "x": 0.5,
+            "y": 0.5,
+            "z": 1
+          }
+        },
+        {
+          "frame": 1.5,
+          "value": {
+            "__type__": "cc.Vec3",
+            "x": 0.2,
+            "y": 0.2,
+            "z": 1
+          }
+        },
+        {
+          "frame": 1.75,
+          "value": {
+            "__type__": "cc.Vec3",
+            "x": 0.7,
+            "y": 0.7,
+            "z": 1
+          }
+        },
+        {
+          "frame": 2.2,
+          "value": {
+            "__type__": "cc.Vec3",
+            "x": 0.3,
+            "y": 0.3,
+            "z": 1
+          }
+        }
+      ],
+      "angle": [
+        {
+          "frame": 0,
+          "value": 0
+        },
+        {
+          "frame": 1.75,
+          "value": -360
+        }
+      ]
+    }
+  },
+  "events": []
+}

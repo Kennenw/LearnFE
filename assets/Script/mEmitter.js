@@ -21,6 +21,10 @@ class mEmitter{
         this._emitter.removeListener(event, listener);
     }
 
+    removeALlEvents(){
+        this._emitter.removeAllListeners();
+    }
+
     destroy(){
         this._emitter.removeAllListeners();
         this._emitter = null;
