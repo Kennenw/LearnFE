@@ -482,6 +482,9 @@
     "progressBar": {
       "__id__": 4
     },
+    "nameCharactor": "",
+    "label": null,
+    "manaConsumption": 50,
     "_id": ""
   },
   {

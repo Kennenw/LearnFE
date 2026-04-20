@@ -6,7 +6,7 @@ cc.Class({
         progressBar: cc.ProgressBar,
         nameCharactor: "",
         label: cc.Label,
-        animation: sp.Skeleton,
+        manaConsumption: 50,
     },
 
     onLoad() {
@@ -14,6 +14,8 @@ cc.Class({
         this.moveX = 0;
         this.label.string = this.nameCharactor;
         this.isAnimation = false;
+        this.animation = this.node.getComponent('sp.Skeleton');
+        this.manaConsumption /= 100;
     },
 
     start() {
@@ -39,12 +41,10 @@ cc.Class({
             }
         }
     },
-
-
     _updateProgressBar(progressBar, dt) {
         let progress = progressBar.progress;
         if (this.moveX !== 0) {
-            progress -= dt * 0.5;
+            progress -= dt * this.manaConsumption;
         }
         if (progress <= 0) {
             if (this.isAnimation === true) {
