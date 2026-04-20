@@ -1,6 +1,5 @@
 const mEmitter = require("../mEmitter");
 
-mEmitter
 cc.Class({
     extends: cc.Component,
 
@@ -20,11 +19,20 @@ cc.Class({
             mEmitter.instance = new mEmitter();
         }
         console.log("instance:", mEmitter.instance);
-        mEmitter.instance.registerEvent('SET_ANIMATION', this.setAnimation.bind(this));
-        mEmitter.instance.registerEvent('SET_TIMELINE', this.setTimeline.bind(this));
-        mEmitter.instance.registerEvent('SET_RUN_ACTION', this.setRunAction.bind(this));
-        mEmitter.instance.registerEvent('SET_TWENS', this.setTwens.bind(this));
+        this.onSetAnimation = this.setAnimation.bind(this);
+        this.onSetTimeline = this.setTimeline.bind(this);
+        this.onSetRunAction = this.setRunAction.bind(this);
+        this.onSetTwen = this.setTwens.bind(this);
+        mEmitter.instance.registerEvent('SET_ANIMATION', this.onSetAnimation);
+        mEmitter.instance.registerEvent('SET_TIMELINE', this.onSetTimeline);
+        mEmitter.instance.registerEvent('SET_RUN_ACTION', this.onSetRunAction);
+        mEmitter.instance.registerEvent('SET_TWENS', this.onSetTwen);
     },
+
+    onDestroy(){
+        
+    }
+    ,
 
     setClearState() {
         this.node.stopAllActions();
