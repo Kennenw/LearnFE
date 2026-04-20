@@ -1330,6 +1330,9 @@
     "label": {
       "__id__": 28
     },
+    "animation": {
+      "__id__": 30
+    },
     "_id": "5a/DIIKAtFR6zCWROP+u/u"
   },
   {
@@ -3089,7 +3092,7 @@
         0,
         0,
         1,
-        1,
+        -1,
         1,
         1
       ]
@@ -3208,6 +3211,9 @@
     "nameCharactor": "NhanVat2",
     "label": {
       "__id__": 78
+    },
+    "animation": {
+      "__id__": 80
     },
     "_id": "22+sSzfZlOgKCGe1YY+JEu"
   },
