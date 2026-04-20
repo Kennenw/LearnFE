@@ -79,7 +79,14 @@ cc.Class({
         cc.tween(this.node)
             .repeatForever(
                 cc.tween()
-                    .by(1, { x: 100 }, { easing: 'easeInOutBounce' })
+                    .to(1, { x: 500, rotation: -45 }, { easing: 'easeInQuint' })
+                    .parallel(
+                        cc.tween()
+                            .to(1, { x: -500 }),
+                        cc.tween()
+                            .to(0.5, { scaleX: -0.5 })
+                    )
+                    .to(0, { scaleX: 0.5, rotation: -45 })
             )
             .start();
     },
