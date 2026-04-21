@@ -26,8 +26,7 @@ module.exports = cc.Class({
         this.state = 'idle';
         this.direction = cc.v2(0, 0);
 
-        const skeleton = this.node.getComponent(sp.Skeleton);
-        charactorManager.instance.register(this.id, skeleton);
+        charactorManager.instance.register(this.id, this.node);
         this.charactorManager = this.manager.getComponent(charactorManager);
 
         this.changeState(this.state);
@@ -40,6 +39,10 @@ module.exports = cc.Class({
         this.bulletKeys = this.charactorManager.bulletKey;
         this.bulletKey = this.bulletKeys[0];
         this.bulletIndex = 0;
+        mEmitter.instance.emit(Event.CURRENT_BULLET, {
+            key: this.bulletKey,
+            spineId: this.id
+        });
     },
 
     update(dt) {
@@ -122,12 +125,20 @@ module.exports = cc.Class({
         this.updateAnimationState();
     },
 
-    changeBullet() {
-        if (this.bulletKeys.length === 0) {
-            return;
+    changeBullet(key) {
+        if (key) {
+            this.bulletKey = key;
+        } else {
+            if (this.bulletKeys.length === 0) {
+                return;
+            }
+            this.bulletIndex = (this.bulletIndex + 1) % this.bulletKeys.length;
+            this.bulletKey = this.bulletKeys[this.bulletIndex];
         }
-        this.bulletIndex = (this.bulletIndex + 1) % this.bulletKeys.length;
-        this.bulletKey = this.bulletKeys[this.bulletIndex];
+        mEmitter.instance.emit(Event.CURRENT_BULLET, {
+            spineId: this.id,
+            key: this.bulletKey
+        });
     },
 
     shoot() {

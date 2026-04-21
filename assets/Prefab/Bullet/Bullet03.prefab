@@ -136,9 +136,9 @@
       "__id__": 1
     },
     "_enabled": true,
-    "speed": 300,
-    "lifeTime": 10,
-    "damage": 50,
+    "speed": 50,
+    "lifeTime": 12,
+    "damage": 1000,
     "_id": ""
   },
   {
