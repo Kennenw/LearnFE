@@ -1,63 +1,68 @@
+const mEmitter = require('../mEmitter');
+const charactorManager = require('./charactorManager');
+const { Event } = require('./constant');
 
-cc.Class({
+module.exports = cc.Class({
     extends: cc.Component,
 
     properties: {
         speed: 100,
         id: 0,
-        bulletType: 1,
         bulletManager: cc.Node,
         shotPosition: cc.Node,
-        shootCooldown: 0.5
+        shootCooldown: 0.1
     },
 
     onLoad() {
-        this.isShooting = false;
         this.shootTimer = 0;
+        this.isShooting = false;
         this.state = 'idle';
+        this.bulletType = 0;
         this.direction = cc.v2(0, 0);
-        this.bullet = this.bulletManager.getComponent('bulletManager');
-        this.spineManager = this.node.parent.getComponent('spineManager');
-
         const skeleton = this.node.getComponent(sp.Skeleton);
-        this.spineManager.register(this.id, skeleton);
-
-        this.playAnimation(this.state);
+        charactorManager.instance.register(this.id, skeleton);
+        this.changeState(this.state);
 
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
     },
 
+    changeBullet() {
+        this.bulletType += 1;
+        if (this.bulletType > 4) {
+            this.bulletType = 0;
+        } else if (this.bulletType < 0) {
+            this.bulletType = 4
+        }
+    },
+
     update(dt) {
+        if (this.isShooting) {
+            this.shootTimer -= dt;
+            if (this.shootTimer <= 0) {
+                this.shoot();
+                this.shootTimer = this.shootCooldown;
+            }
+            return;
+        }
+
         this.node.setPosition(
             this.node.x + dt * this.speed * this.direction.x,
             this.node.y + dt * this.speed * this.direction.y
         );
-
-        if (!this.isShooting) {
-            this.shootTimer -= dt;
-            if (this.shootTimer <= 0) {
-                this.isShooting = true;
-            }
-        }
     },
 
     shoot() {
         const positionFire = this.bulletManager.convertToNodeSpaceAR(this.shotPosition.convertToWorldSpaceAR(cc.v2(0, 0)));
-        this.bullet.fire(this.bulletType, positionFire);
-        this.isShooting = false;
-        this.shootTimer = this.shootCooldown;
+        mEmitter.instance.emit(Event.SHOOT, {
+            type: this.bulletType,
+            position: positionFire
+        })
     },
 
     onDestroy() {
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
-    },
-
-    playAnimation(animation) {
-        if (this.spineManager) {
-            this.spineManager.play(this.id, animation);
-        }
     },
 
     onKeyDown(event) {
@@ -79,27 +84,37 @@ cc.Class({
                 break;
             }
             case cc.macro.KEY.space: {
-                this.shoot();
-                this.changeState('shoot');
-                return;
+                this.isShooting = true;
+                if (this.shootTimer <= 0) {
+                    this.shootTimer = 0;
+                }
+                break;
+            }
+            case cc.macro.KEY.d: {
+                console.log(this.bulletType);
+                this.changeBullet();
+                break;
             }
             default:
                 break;
         }
-        this.updateMoveState();
+        this.updateAnimationState();
     },
 
-    updateMoveState() {
+    updateAnimationState() {
+        if (this.isShooting) {
+            this.changeState('shoot');
+            return;
+        }
         const isMoving = this.direction.x !== 0 || this.direction.y !== 0;
         const state = isMoving ? 'walk' : 'idle';
-
         this.changeState(state);
     },
 
     changeState(newState) {
         if (newState !== this.state) {
             this.state = newState;
-            this.playAnimation(this.state);
+            charactorManager.instance.play(this.id, this.state);
         }
     },
 
@@ -117,12 +132,12 @@ cc.Class({
             }
             case cc.macro.KEY.space: {
                 this.isShooting = false;
-                this.updateMoveState();
+                this.shootTimer = 0;
                 break;
             }
             default:
                 break;
         }
-        this.updateMoveState();
+        this.updateAnimationState();
     },
 });
