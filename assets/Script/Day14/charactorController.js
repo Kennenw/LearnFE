@@ -10,30 +10,36 @@ module.exports = cc.Class({
         id: 0,
         bulletManager: cc.Node,
         shotPosition: cc.Node,
-        shootCooldown: 0.1
+        shootCooldown: 0.1,
+        manager: cc.Node,
+        audioShoot: cc.AudioSource
     },
 
     onLoad() {
+        this.maxX = 500;
+        this.minX = -90;
+        this.maxY = 160;
+        this.minY = -320;
+
         this.shootTimer = 0;
         this.isShooting = false;
         this.state = 'idle';
-        this.bulletType = 0;
         this.direction = cc.v2(0, 0);
+
         const skeleton = this.node.getComponent(sp.Skeleton);
         charactorManager.instance.register(this.id, skeleton);
+        this.charactorManager = this.manager.getComponent(charactorManager);
+
         this.changeState(this.state);
 
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
     },
 
-    changeBullet() {
-        this.bulletType += 1;
-        if (this.bulletType > 4) {
-            this.bulletType = 0;
-        } else if (this.bulletType < 0) {
-            this.bulletType = 4
-        }
+    start() {
+        this.bulletKeys = this.charactorManager.bulletKey;
+        this.bulletKey = this.bulletKeys[0];
+        this.bulletIndex = 0;
     },
 
     update(dt) {
@@ -46,23 +52,16 @@ module.exports = cc.Class({
             return;
         }
 
-        this.node.setPosition(
-            this.node.x + dt * this.speed * this.direction.x,
-            this.node.y + dt * this.speed * this.direction.y
-        );
-    },
+        let newX = this.node.x + dt * this.speed * this.direction.x;
+        let newY = this.node.y + dt * this.speed * this.direction.y;
 
-    shoot() {
-        const positionFire = this.bulletManager.convertToNodeSpaceAR(this.shotPosition.convertToWorldSpaceAR(cc.v2(0, 0)));
-        mEmitter.instance.emit(Event.SHOOT, {
-            type: this.bulletType,
-            position: positionFire
-        })
-    },
+        if (newX > this.maxX) newX = this.maxX;
+        if (newX < this.minX) newX = this.minX;
 
-    onDestroy() {
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+        if (newY > this.maxY) newY = this.maxY;
+        if (newY < this.minY) newY = this.minY;
+
+        this.node.setPosition(newX, newY);
     },
 
     onKeyDown(event) {
@@ -91,7 +90,6 @@ module.exports = cc.Class({
                 break;
             }
             case cc.macro.KEY.d: {
-                console.log(this.bulletType);
                 this.changeBullet();
                 break;
             }
@@ -99,23 +97,6 @@ module.exports = cc.Class({
                 break;
         }
         this.updateAnimationState();
-    },
-
-    updateAnimationState() {
-        if (this.isShooting) {
-            this.changeState('shoot');
-            return;
-        }
-        const isMoving = this.direction.x !== 0 || this.direction.y !== 0;
-        const state = isMoving ? 'walk' : 'idle';
-        this.changeState(state);
-    },
-
-    changeState(newState) {
-        if (newState !== this.state) {
-            this.state = newState;
-            charactorManager.instance.play(this.id, this.state);
-        }
     },
 
     onKeyUp(event) {
@@ -139,5 +120,44 @@ module.exports = cc.Class({
                 break;
         }
         this.updateAnimationState();
+    },
+
+    changeBullet() {
+        if (this.bulletKeys.length === 0) {
+            return;
+        }
+        this.bulletIndex = (this.bulletIndex + 1) % this.bulletKeys.length;
+        this.bulletKey = this.bulletKeys[this.bulletIndex];
+    },
+
+    shoot() {
+        const positionFire = this.bulletManager.convertToNodeSpaceAR(this.shotPosition.convertToWorldSpaceAR(cc.v2(0, 0)));
+        mEmitter.instance.emit(Event.SHOOT, {
+            type: this.bulletKey,
+            position: positionFire
+        });
+        this.audioShoot.play();
+    },
+
+    updateAnimationState() {
+        if (this.isShooting) {
+            this.changeState('shoot');
+            return;
+        }
+        const isMoving = this.direction.x !== 0 || this.direction.y !== 0;
+        const state = isMoving ? 'walk' : 'idle';
+        this.changeState(state);
+    },
+
+    changeState(newState) {
+        if (newState !== this.state) {
+            this.state = newState;
+            charactorManager.instance.play(this.id, this.state);
+        }
+    },
+
+    onDestroy() {
+        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
     },
 });

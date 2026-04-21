@@ -10,10 +10,12 @@ class mEmitter {
     }
 
     registerEvent(event, listener) {
+        this.removeEvent(event, listener);
         this._emitter.on(event, listener);
     }
 
     registerOnce(event, listener) {
+        this.removeEvent(event, listener);
         this._emitter.once(event, listener);
     }
 

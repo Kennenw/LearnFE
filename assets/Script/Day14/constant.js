@@ -3,4 +3,5 @@ export const Event = {
     KEY_UP: "KEY_UP",
     SHOOT: "SHOOT",
     BULLET_HIT: "BULLET_HIT",
+    LIST_KEY_BULLET: "LIST_KEY_BULLET"
 }

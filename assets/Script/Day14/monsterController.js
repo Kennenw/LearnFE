@@ -6,10 +6,12 @@ const monsterController = cc.Class({
         speeds: 13,
         timeBack: 5,
         progressBar: cc.ProgressBar,
-        damagePrefab: cc.Prefab
+        damagePrefab: cc.Prefab,
+        hpLabel: cc.Label
     },
 
     onLoad() {
+        this.defaultHP = this.hp;
         this.directionY = -1;
         this.currentTime = this.timeBack;
     },
@@ -21,12 +23,17 @@ const monsterController = cc.Class({
             this.currentTime = this.timeBack;
         }
         this.node.y += dt * this.speeds * this.directionY;
+        this.showHP();
     },
 
     takeDamage(damage) {
         this.hp -= damage;
         this._updateProgressBar();
         this.showDamage(damage);
+    },
+
+    showHP() {
+        this.hpLabel.getComponent(cc.Label).string = `${this.hp}/${this.defaultHP}`;
     },
 
     showDamage(damage) {

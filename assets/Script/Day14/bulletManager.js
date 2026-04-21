@@ -27,6 +27,9 @@ const bulletManager = cc.Class({
 
         this._onShoot = this.onShoot.bind(this);
         mEmitter.instance.registerEvent(Event.SHOOT, this._onShoot);
+
+        this.arrayBulletKey = Array.from(this.bulletTypes.keys());
+        mEmitter.instance.emit(Event.LIST_KEY_BULLET, this.arrayBulletKey);
     },
 
     onShoot(data) {

@@ -1,3 +1,6 @@
+const mEmitter = require("../mEmitter");
+const { Event } = require("./constant");
+
 const charactorManager = cc.Class({
     extends: cc.Component,
 
@@ -13,10 +16,17 @@ const charactorManager = cc.Class({
     },
 
     onLoad() {
+        this.bulletKey = [];
         if (charactorManager.instance === null) {
             charactorManager.instance = this;
         }
         this.spines = new Map();
+        this._onKeyBullets = this.onKeyBullets.bind(this);
+        mEmitter.instance.registerEvent(Event.LIST_KEY_BULLET, this._onKeyBullets);
+    },
+
+    onKeyBullets(data) {
+        this.bulletKey = data;
     },
 
     register(id, skeleton) {
