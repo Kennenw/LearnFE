@@ -1,0 +1,13 @@
+{
+  "name": "cocos3",
+  "uuid": "511f77fc-0534-456b-9184-b587ffdd60fe",
+  "creator": {
+    "version": "3.7.3"
+  },
+  "devDependencies": {
+    "javascript-state-machine": "^3.1.0"
+  },
+  "dependencies": {
+    "events": "^3.3.0"
+  }
+}
