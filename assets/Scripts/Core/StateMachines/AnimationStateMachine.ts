@@ -13,19 +13,16 @@ export class AnimationStateMachine {
             init: CHARACTER_ANIMATION_STATE.PORTAL,
 
             transitions: [
-                { name: 'idle', from: [CHARACTER_ANIMATION_STATE.RUN, CHARACTER_ANIMATION_STATE.PORTAL, CHARACTER_ANIMATION_STATE.SHOOT], to: CHARACTER_ANIMATION_STATE.IDLE },
+                { name: 'idle', from: [CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.RUN, CHARACTER_ANIMATION_STATE.PORTAL, CHARACTER_ANIMATION_STATE.SHOOT], to: CHARACTER_ANIMATION_STATE.IDLE },
                 { name: 'run', from: [CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.SHOOT, CHARACTER_ANIMATION_STATE.RUN], to: CHARACTER_ANIMATION_STATE.RUN },
-                { name: 'dead', from: '*', to: CHARACTER_ANIMATION_STATE.DEATH },
+                { name: 'death', from: '*', to: CHARACTER_ANIMATION_STATE.DEATH },
             ],
 
             methods: {
                 onEnterState: (lifecycle: any) => {
-                    this._spine.setCompleteListener((track) => {
+                    this._spine.setCompleteListener(() => {
                         if (this._state.is(CHARACTER_ANIMATION_STATE.PORTAL)) {
                             this.idle();
-                        }
-                        if (track.trackIndex === 1) {
-                            this._spine.clearTrack(1);
                         }
                     })
                     this.playAnimation(lifecycle.to);
@@ -63,15 +60,26 @@ export class AnimationStateMachine {
         }
     }
 
+    isLocked(): boolean {
+        return this._state.is(CHARACTER_ANIMATION_STATE.PORTAL)
+            || this._state.is(CHARACTER_ANIMATION_STATE.DEATH);
+    }
+
     run() {
-        this._state.run();
+        if (!this._state.is(CHARACTER_ANIMATION_STATE.RUN)) {
+            this._state.run();
+        }
     }
 
     idle() {
-        this._state.idle();
+        if (!this._state.is(CHARACTER_ANIMATION_STATE.IDLE)) {
+            this._state.idle();
+        }
     }
 
-    dead() {
-        this._state.dead();
+    death() {
+        if (!this._state.is(CHARACTER_ANIMATION_STATE.DEATH)) {
+            this._state.death();
+        }
     }
 } 

@@ -8,7 +8,7 @@ export class MoveLeftCommand implements ICommand {
     }
 
     release(target: CharacterController): void {
-
+        target.moveLeft(false);
     }
 }
 

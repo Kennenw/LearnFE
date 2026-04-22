@@ -7,7 +7,7 @@ export class MoveUpCommand implements ICommand {
     }
 
     release(target: CharacterController): void {
-
+        target.moveUp(false);
     }
 }
 
