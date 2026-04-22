@@ -1,14 +1,22 @@
 import { _decorator, Component, Node } from 'cc';
+import { CharacterManager } from '../Managers/CharacterManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('CharacterController')
 export class CharacterController extends Component {
-    start() {
 
+    @property
+    speed: number = 5;
+
+    @property
+    id: string = '1';
+
+    protected start(): void {
+        CharacterManager.register(this.id, this);
     }
 
-    update(deltaTime: number) {
-        
+    moveLeft() {
+        console.log("move Left");
     }
 }
 

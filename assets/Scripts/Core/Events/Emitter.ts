@@ -1,14 +1,13 @@
-import { _decorator, Component, Node } from 'cc';
-const { ccclass, property } = _decorator;
+import mitt from 'mitt';
+import { GameEvents } from '../Constants/GameEvents';
 
-@ccclass('Emitter')
-export class Emitter extends Component {
-    start() {
+class Emitter {
+    private emitter = mitt<GameEvents>();
 
-    }
-
-    update(deltaTime: number) {
-        
-    }
+    on = this.emitter.on.bind(this.emitter);
+    off = this.emitter.off.bind(this.emitter);
+    emit = this.emitter.emit.bind(this.emitter);
 }
+
+export const emitter = new Emitter();
 
