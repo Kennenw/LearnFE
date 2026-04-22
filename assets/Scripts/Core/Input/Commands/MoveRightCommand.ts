@@ -1,14 +1,14 @@
 import { CharacterController } from "../../../Controllers/CharacterController";
 import { ICommand } from "../ICommand";
 
-export class MoveLeftCommand implements ICommand {
-
+export class MoveRightCommand implements ICommand {
     execute(target: CharacterController): void {
-        target.moveLeft();
+        target.moveRight();
     }
 
     release(target: CharacterController): void {
 
     }
 }
+
 

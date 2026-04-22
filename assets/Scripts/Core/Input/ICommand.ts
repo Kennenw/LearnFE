@@ -1,4 +1,7 @@
+import { CharacterController } from "../../Controllers/CharacterController";
+
 export interface ICommand {
-    execute(): void;    
+    execute(target: CharacterController): void;
+    release(target: CharacterController): void;
 }
 
