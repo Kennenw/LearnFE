@@ -48,10 +48,10 @@ const charactorManager = cc.Class({
         }
     },
 
-    play(id, animation, loop = true) {
+    play(id, animation, layout = 0,loop = true) {
         const node = this.spines.get(id);
         const skeleton = node.getComponent(sp.Skeleton);
-        skeleton.setAnimation(0, animation, loop);
+        skeleton.setAnimation(layout, animation, loop);
     },
 });
 

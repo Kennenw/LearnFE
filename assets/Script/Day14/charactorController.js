@@ -152,7 +152,7 @@ module.exports = cc.Class({
 
     updateAnimationState() {
         if (this.isShooting) {
-            this.changeState('shoot');
+            this.changeState('shoot', 1, false);
             return;
         }
         const isMoving = this.direction.x !== 0 || this.direction.y !== 0;
@@ -160,10 +160,10 @@ module.exports = cc.Class({
         this.changeState(state);
     },
 
-    changeState(newState) {
+    changeState(newState, layout = 0, loop = true) {
         if (newState !== this.state) {
             this.state = newState;
-            charactorManager.instance.play(this.id, this.state);
+            charactorManager.instance.play(this.id, this.state, layout, loop);
         }
     },
 

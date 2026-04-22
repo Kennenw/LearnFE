@@ -23,10 +23,8 @@ module.exports = cc.Class({
         this.spineId = spineId;
         const target = this.button.target;
         if (isSelected) {
-            target.setScale(0.9);
             target.opacity = 180;
         } else {
-            target.setScale(1);
             target.opacity = 255;
         }
     },
