@@ -13,6 +13,10 @@ export class ButtonController extends Component {
         emitter.emit(GameEvents.POPUP_SETTING_PLAY, PopUp.SETTING);
     }
 
+    onClickCloseSetting() {
+        emitter.emit(GameEvents.POPUP_SETTING_CLOSE);
+    }
+
     onClickPlay() {
         emitter.emit(GameEvents.BUTTON_PLAY);
     }
@@ -22,13 +26,12 @@ export class ButtonController extends Component {
         emitter.emit(GameEvents.POPUP_PAUSE_PLAY, PopUp.PAUSE);
     }
 
-    onClosePopUp(event: Event, customData: string) {
-        emitter.emit(GameEvents.POPUP_CLOSE, customData);
+    onClickClosePause() {
+        emitter.emit(GameEvents.POPUP_PAUSE_CLOSE);
     }
 
-    onRoomQuit() {
-        emitter.emit(GameEvents.ROOM_QUIT);
+    onClickQuit() {
+        emitter.emit(GameEvents.ROOM_QUIT, PopUp.PAUSE);
     }
-
 }
 

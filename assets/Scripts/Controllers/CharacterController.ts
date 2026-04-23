@@ -1,4 +1,4 @@
-import { _decorator, animation, Component, Node, sp, Vec2 } from 'cc';
+import { _decorator, Component, sp, Vec2 } from 'cc';
 import { CharacterManager } from '../Managers/CharacterManager';
 import { AnimationStateMachine } from '../Core/StateMachines/AnimationStateMachine';
 const { ccclass, property } = _decorator;
@@ -17,17 +17,21 @@ export class CharacterController extends Component {
 
     private _animation: AnimationStateMachine;
     private _velocity: Vec2 = new Vec2(0, 0);
+    private _lockMovement: boolean = false;
 
     protected start(): void {
         CharacterManager.instance.register(this.id, this);
         this._animation = new AnimationStateMachine(this.spine);
+        this._animation.onShootComplete = () => {
+            this._lockMovement = false;
+        };
     }
 
     protected update(dt: number): void {
-        if (this._animation.isLocked()) {
-            return;
-        }
         this._updateAnimation();
+        if (!this._animation.isShooting()) {
+            this._lockMovement = false;
+        }
         this._move(dt);
     }
 
@@ -43,12 +47,27 @@ export class CharacterController extends Component {
     }
 
     private _updateAnimation() {
+        if (this._animation.isLocked()) {
+            return;
+        }
         if (this._isIdle()) {
             this._animation.idle();
         } else {
             this._animation.run();
         }
     }
+
+    shoot(keyDown: boolean = true) {
+        if (keyDown) {
+            if (this._animation.isLocked()) {
+                return;
+            }
+            this._lockMovement = true;
+            this._velocity.set(0, 0);
+            this._animation.shoot();
+        }
+    }
+
 
     moveLeft(keyDown: boolean = true) {
         this._setVelocityX(keyDown, -1);
@@ -78,6 +97,10 @@ export class CharacterController extends Component {
     }
 
     private _setVelocityX(keyDown: boolean, direction: number) {
+        if (this._lockMovement) {
+            this._velocity.x = 0;
+            return;
+        }
         if (keyDown) {
             if (this._animation.isLocked()) {
                 return;
@@ -91,6 +114,10 @@ export class CharacterController extends Component {
     }
 
     private _setVelocityY(keyDown: boolean, direction: number) {
+        if (this._lockMovement) {
+            this._velocity.y = 0;
+            return;
+        }
         if (keyDown) {
             if (this._animation.isLocked()) {
                 return;
@@ -100,9 +127,6 @@ export class CharacterController extends Component {
         } else {
             this._velocity.y = 0;
         }
-    }
-
-    shoot() {
     }
 }
 

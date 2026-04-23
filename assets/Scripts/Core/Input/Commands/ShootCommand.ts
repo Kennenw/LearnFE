@@ -7,7 +7,7 @@ export class ShootCommand implements ICommand {
     }
 
     release(target: CharacterController): void {
-
+        target.shoot(false);
     }
 }
 

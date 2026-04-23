@@ -6,12 +6,14 @@ import { MoveRightCommand } from "./Commands/MoveRightCommand";
 import { MoveUpCommand } from "./Commands/MoveUpCommand";
 import { MoveDownCommand } from "./Commands/MoveDownCommand";
 import { ShootCommand } from "./Commands/ShootCommand";
+import { CharacterController } from "../../Controllers/CharacterController";
 const { ccclass } = _decorator;
 
 @ccclass('InputHandler')
 export class InputHandler extends Component {
     private _map = new Map<number, ICommand>();
     private _holdingKeys = new Set<number>();
+    private _tagert: CharacterController;
 
     bind(key: number, command: ICommand) {
         this._map.set(key, command);
@@ -42,10 +44,9 @@ export class InputHandler extends Component {
     }
 
     protected update(dt: number): void {
-        const target = CharacterManager.instance.getMainCharacter();
         this._holdingKeys.forEach((key) => {
             const command = this._map.get(key);
-            command.execute(target);
+            command.execute(this._tagert);
         })
     }
 
@@ -62,21 +63,26 @@ export class InputHandler extends Component {
             return;
         }
 
+        if (event.getButton() === EventMouse.BUTTON_LEFT) {
+            command.execute(this._tagert);
+            return;
+        }
+
         if (!this._holdingKeys.has(EventMouse.BUTTON_LEFT)) {
             this._holdingKeys.add(EventMouse.BUTTON_LEFT);
-            const target = CharacterManager.instance.getMainCharacter();
-            command.execute(target);
+            this._tagert = CharacterManager.instance.getMainCharacter();
+            command.execute(this._tagert);
         }
     }
 
-    onMouseUp(event: EventMouse) {
+    onMouseUp() {
         const command = this._map.get(EventMouse.BUTTON_LEFT);
         if (!command) {
             return;
         }
         this._holdingKeys.delete(EventMouse.BUTTON_LEFT);
-        const target = CharacterManager.instance.getMainCharacter();
-        command.release(target);
+        this._tagert = CharacterManager.instance.getMainCharacter();
+        command.release(this._tagert);
     }
 
     onKeyDown(event: EventKeyboard) {
@@ -85,10 +91,15 @@ export class InputHandler extends Component {
             return;
         }
 
+        if (event.keyCode === KeyCode.SPACE) {
+            command.execute(this._tagert);
+            return;
+        }
+
         if (!this._holdingKeys.has(event.keyCode)) {
             this._holdingKeys.add(event.keyCode);
-            const target = CharacterManager.instance.getMainCharacter();
-            command.execute(target);
+            this._tagert = CharacterManager.instance.getMainCharacter();
+            command.execute(this._tagert);
         }
     }
 
@@ -98,7 +109,7 @@ export class InputHandler extends Component {
             return;
         }
         this._holdingKeys.delete(event.keyCode);
-        const target = CharacterManager.instance.getMainCharacter();
-        command.release(target);
+        this._tagert = CharacterManager.instance.getMainCharacter();
+        command.release(this._tagert);
     }
 }

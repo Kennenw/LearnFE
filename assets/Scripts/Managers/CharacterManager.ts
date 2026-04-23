@@ -18,6 +18,12 @@ export class CharacterManager extends Component {
         }
     }
 
+    protected onDestroy(): void {
+        if (CharacterManager.instance === this) {
+            CharacterManager.instance = null;
+        }
+    }
+
     register(id: string, controller: CharacterController) {
         this._controllers.set(id, controller);
     }

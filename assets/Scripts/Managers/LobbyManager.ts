@@ -25,6 +25,12 @@ export class LobbyManager extends Component {
         emitter.on(GameEvents.LOBBY_START, this._onLobby);
     }
 
+    protected onDestroy(): void {
+        emitter.off(GameEvents.ROOM_ID, this._onRoomKey);
+        emitter.off(GameEvents.BUTTON_PLAY, this._onPlayGame);
+        emitter.off(GameEvents.LOBBY_START, this._onLobby);
+    }
+
     onLobby() {
         this.node.active = true;
     }
@@ -35,7 +41,7 @@ export class LobbyManager extends Component {
 
     onPlayGame() {
         this.node.active = false;
-        emitter.emit(GameEvents.SCREEN_ROOM_PLAY, this._roomIds[0]);
+        emitter.emit(GameEvents.ROOM_PLAY, this._roomIds[0]);
     }
 }
 
