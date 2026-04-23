@@ -24,11 +24,10 @@ export class CharacterController extends Component {
     }
 
     protected update(dt: number): void {
-        this._updateAnimation();
-
-        if (this._isIdle()) {
+        if (this._animation.isLocked()) {
             return;
         }
+        this._updateAnimation();
         this._move(dt);
     }
 

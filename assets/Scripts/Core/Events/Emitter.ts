@@ -1,8 +1,8 @@
 import mitt from 'mitt';
-import { GameEvents } from '../Constants/GameEvents';
+import { Events } from '../Constants/GameEvents';
 
 class Emitter {
-    private emitter = mitt<GameEvents>();
+    private emitter = mitt<Events>();
 
     on = this.emitter.on.bind(this.emitter);
     off = this.emitter.off.bind(this.emitter);
