@@ -17,7 +17,7 @@ export class CharacterController extends Component {
 
     private _animation: AnimationStateMachine;
     private _velocity: Vec2 = new Vec2(0, 0);
-    private _previousDirection: number = 1;
+    private _direction: number = 1;
 
     protected start(): void {
         this._animation = new AnimationStateMachine(this.node.getComponent(sp.Skeleton));
@@ -57,10 +57,7 @@ export class CharacterController extends Component {
             }
             this._velocity.set(0, 0);
             this._animation.shoot();
-            const positionShoot = this.positionShoot.inverseTransformPoint(new Vec3(), this.node.worldPosition);
-            console.log('local:', this.positionShoot.position);
-            console.log('world:', this.positionShoot.worldPosition);
-            emitter.emit(GameEvents.SHOOT, { bulletType: 'BulletFire', direction: this._previousDirection, position: this.positionShoot.worldPosition });
+            emitter.emit(GameEvents.SHOOT, { bulletType: 'BulletFire', direction: this._direction > 0 ? 1 : -1, position: this.positionShoot.worldPosition });
         }
     }
 
@@ -84,7 +81,7 @@ export class CharacterController extends Component {
         if (direction === 0) {
             return;
         }
-        this._previousDirection = this.node.scale.x;
+        this._direction = this.node.scale.x;
         const currentScaleX = this.node.scale.x;
         if (direction * currentScaleX < 0) {
             this.node.setScale(this.node.scale.y * direction, this.node.scale.y);

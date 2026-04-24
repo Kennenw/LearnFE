@@ -18,7 +18,7 @@ export class EnemyController extends Component {
     private _velocity: Vec2 = new Vec2(1, 0);
 
     protected update(dt: number): void {
-        this.move(dt);
+      //  this.move(dt);
         this._updateProgressBar();
     }
 

@@ -26,11 +26,10 @@ export class BulletManager extends Component {
         const prefab = this._prefabs.get(data.bulletType);
         const node = instantiate(prefab);
         node.parent = this.node;
-        node.setPosition(data.position);
+        const positionSpwan = this.node.inverseTransformPoint(new Vec3(), data.position);
+        node.setPosition(positionSpwan);
         const controller = node.getComponent(BulletController);
-        console.log('ssf', data.direction)
         controller.direction = data.direction;
-        console.log('ss', controller);
         this._bullet.set(node.uuid, controller);
     }
 
