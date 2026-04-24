@@ -1,4 +1,4 @@
-import { Node } from "cc"
+import { Node, Vec3 } from "cc"
 import { CharacterController } from "../../Controllers/CharacterController"
 
 export const GameEvents = {
@@ -6,7 +6,7 @@ export const GameEvents = {
     CHANGED_CHARACTER: 'CHANGED:CHARACTER',
 
     BULLET_HIT: 'BULLET;HIT',
-
+    SHOOT: 'SHOOT',
 
     BUTTON_PLAY: 'BUTTON:PLAY',
 
@@ -28,8 +28,9 @@ export const GameEvents = {
 export type Events = {
     [GameEvents.SPAWN_CHARACTER]: string,
     [GameEvents.SPAWN_CHARACTER]: CharacterController,
+    [GameEvents.SHOOT]: { bulletType: string, direction: number, position: Vec3 },
 
-    [GameEvents.BULLET_HIT]: {damage: number, target: Node}
+    [GameEvents.BULLET_HIT]: { damage: number, target: Node }
 
     [GameEvents.LOBBY_START]: void,
 

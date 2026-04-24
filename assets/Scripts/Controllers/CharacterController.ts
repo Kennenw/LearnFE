@@ -1,5 +1,7 @@
-import { _decorator, Component, sp, Vec2, Node, director } from 'cc';
+import { _decorator, Component, sp, Vec2, Node, Vec3 } from 'cc';
 import { AnimationStateMachine } from '../Core/StateMachines/AnimationStateMachine';
+import { emitter } from '../Core/Events/Emitter';
+import { GameEvents } from '../Core/Constants/GameEvents';
 const { ccclass, property } = _decorator;
 
 @ccclass('CharacterController')
@@ -8,18 +10,14 @@ export class CharacterController extends Component {
     @property
     speed: number = 5;
 
-    @property
-    prefabName: string;
+    @property(Node)
+    positionShoot: Node;
 
     id: string = '';
 
     private _animation: AnimationStateMachine;
     private _velocity: Vec2 = new Vec2(0, 0);
-
-    init(prefabName: string, id: string) {
-        this.prefabName = prefabName;
-        this.id = id;
-    }
+    private _previousDirection: number = 1;
 
     protected start(): void {
         this._animation = new AnimationStateMachine(this.node.getComponent(sp.Skeleton));
@@ -59,6 +57,10 @@ export class CharacterController extends Component {
             }
             this._velocity.set(0, 0);
             this._animation.shoot();
+            const positionShoot = this.positionShoot.inverseTransformPoint(new Vec3(), this.node.worldPosition);
+            console.log('local:', this.positionShoot.position);
+            console.log('world:', this.positionShoot.worldPosition);
+            emitter.emit(GameEvents.SHOOT, { bulletType: 'BulletFire', direction: this._previousDirection, position: this.positionShoot.worldPosition });
         }
     }
 
@@ -82,7 +84,7 @@ export class CharacterController extends Component {
         if (direction === 0) {
             return;
         }
-
+        this._previousDirection = this.node.scale.x;
         const currentScaleX = this.node.scale.x;
         if (direction * currentScaleX < 0) {
             this.node.setScale(this.node.scale.y * direction, this.node.scale.y);

@@ -18,13 +18,16 @@ export class BulletController extends Component {
     direction: number;
 
     protected update(dt: number): void {
+        console.log('firs2t', this.node.position.x)
+        console.log('firs2t', this.direction)
+        console.log('first', this.node.position.x + dt * this.speed * this.direction)
         this.move(dt);
         this.destruction(dt);
     }
 
     destruction(dt) {
-        this.direction -= dt;
-        if (this.direction <= 0) {
+        this.lifeTime -= dt;
+        if (this.lifeTime <= 0) {
             this.node.destroy();
         }
     }
