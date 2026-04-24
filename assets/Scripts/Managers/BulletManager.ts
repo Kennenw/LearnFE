@@ -1,27 +1,38 @@
-import { _decorator, Component, Node, Prefab } from 'cc';
+import { _decorator, Component, director, instantiate, Node, Prefab, Vec3 } from 'cc';
+import { BulletController } from '../Controllers/BulletController';
 const { ccclass, property } = _decorator;
-
-@ccclass('BulletPrefab')
-class BulletPrefab {
-    @property
-    id: string = '';
-
-    @property(Prefab)
-    prefab: Prefab;
-}
 
 @ccclass('BulletManager')
 export class BulletManager extends Component {
-    @property([BulletPrefab])
-    bullets: BulletPrefab[] = [];
+    @property([Prefab])
+    bullets: Prefab[] = [];
 
-    private _bullets: Map<string, Prefab> = new Map();
-    
+    private _prefabs: Map<string, Prefab> = new Map();
+    private _bullet: BulletController;
+
     protected onLoad(): void {
-        this.bullets.forEach(bullet => {
-            this._bullets.set(bullet.id, bullet.prefab);
+        this.bullets.forEach(prefab => {
+            this._prefabs.set(prefab.name, prefab);
         })
     }
+
+    spwan(prefabName: string, direction: number, position: Vec3) {
+        const prefab = this._prefabs.get(prefabName);
+        const node = instantiate(prefab);
+        node.setPosition(position);
+        this._bullet = this.node.getComponent(BulletController);
+        this._bullet.direction = direction;
+        node.parent = this.node;
+    }
+
+    pause() {
+        director.pause();
+    }
+
+    resume() {
+        director.resume();
+    }
+
 
 }
 

@@ -1,12 +1,13 @@
 import { _decorator, Component, EventKeyboard, EventMouse, Input, input, KeyCode } from "cc";
 import { ICommand } from "./ICommand";
 import { MoveLeftCommand } from "./Commands/MoveLeftCommand";
-import { CharacterManager } from "../../Managers/CharacterManager";
 import { MoveRightCommand } from "./Commands/MoveRightCommand";
 import { MoveUpCommand } from "./Commands/MoveUpCommand";
 import { MoveDownCommand } from "./Commands/MoveDownCommand";
 import { ShootCommand } from "./Commands/ShootCommand";
 import { CharacterController } from "../../Controllers/CharacterController";
+import { emitter } from "../Events/Emitter";
+import { GameEvents } from "../Constants/GameEvents";
 const { ccclass } = _decorator;
 
 @ccclass('InputHandler')
@@ -20,6 +21,7 @@ export class InputHandler extends Component {
     }
 
     protected onLoad(): void {
+        emitter.on(GameEvents.CHANGED_CHARACTER, this._onCharacterChanged.bind(this));
         input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
@@ -55,22 +57,21 @@ export class InputHandler extends Component {
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
         input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+        emitter.off(GameEvents.CHANGED_CHARACTER, this._onCharacterChanged.bind(this));
     }
 
-    onMouseDown(event: EventMouse) {
+    private _onCharacterChanged = (c: CharacterController) => {
+        this._tagert = c;
+    };
+
+    onMouseDown() {
         const command = this._map.get(EventMouse.BUTTON_LEFT);
         if (!command) {
             return;
         }
 
-        if (event.getButton() === EventMouse.BUTTON_LEFT) {
-            command.execute(this._tagert);
-            return;
-        }
-
         if (!this._holdingKeys.has(EventMouse.BUTTON_LEFT)) {
             this._holdingKeys.add(EventMouse.BUTTON_LEFT);
-            this._tagert = CharacterManager.instance.getMainCharacter();
             command.execute(this._tagert);
         }
     }
@@ -81,7 +82,6 @@ export class InputHandler extends Component {
             return;
         }
         this._holdingKeys.delete(EventMouse.BUTTON_LEFT);
-        this._tagert = CharacterManager.instance.getMainCharacter();
         command.release(this._tagert);
     }
 
@@ -91,14 +91,8 @@ export class InputHandler extends Component {
             return;
         }
 
-        if (event.keyCode === KeyCode.SPACE) {
-            command.execute(this._tagert);
-            return;
-        }
-
         if (!this._holdingKeys.has(event.keyCode)) {
             this._holdingKeys.add(event.keyCode);
-            this._tagert = CharacterManager.instance.getMainCharacter();
             command.execute(this._tagert);
         }
     }
@@ -109,7 +103,6 @@ export class InputHandler extends Component {
             return;
         }
         this._holdingKeys.delete(event.keyCode);
-        this._tagert = CharacterManager.instance.getMainCharacter();
         command.release(this._tagert);
     }
 }

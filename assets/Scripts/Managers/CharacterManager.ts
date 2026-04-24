@@ -1,37 +1,49 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, director, instantiate, Prefab } from 'cc';
 import { CharacterController } from '../Controllers/CharacterController';
+import { emitter } from '../Core/Events/Emitter';
+import { GameEvents } from '../Core/Constants/GameEvents';
 const { ccclass, property } = _decorator;
 
 @ccclass('CharacterManager')
 export class CharacterManager extends Component {
+    @property([Prefab])
+    characters: Prefab[] = [];
 
-    @property
-    mainCharacter: string = '';
-
-    private _controllers: Map<string, CharacterController> = new Map();
-
-    static instance: CharacterManager;
+    private _prefabs: Map<string, Prefab> = new Map();
+    private _character: CharacterController;
 
     protected onLoad(): void {
-        if (!CharacterManager.instance) {
-            CharacterManager.instance = this;
-        }
+        this.characters.forEach(prefab => {
+            this._prefabs.set(prefab.name, prefab);
+        });
     }
 
-    protected onDestroy(): void {
-        if (CharacterManager.instance === this) {
-            CharacterManager.instance = null;
-        }
+    protected start(): void {
+        const main = this.getMainCharacter();
+        emitter.emit(GameEvents.CHANGED_CHARACTER, main);
     }
 
-    register(id: string, controller: CharacterController) {
-        this._controllers.set(id, controller);
+    getMainCharacter(name: string = 'Character'): CharacterController {
+        if (this._character) {
+            return this._character;
+        } return this._spawn(name);
+
     }
 
-    getMainCharacter(): CharacterController {
-        return this._controllers.get(this.mainCharacter)
-            ?? this._controllers.values().next().value;
+    pause() {
+        director.pause();
     }
 
+    resume() {
+        director.resume();
+    }
+
+    private _spawn(prefabName: string): CharacterController {
+        const prefab = this._prefabs.get(prefabName);
+        const node = instantiate(prefab);
+        this._character = node.getComponent(CharacterController);
+        node.parent = this.node;
+        return this._character;
+    }
 }
 

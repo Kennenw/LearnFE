@@ -5,15 +5,17 @@ import { sp } from 'cc';
 export class AnimationStateMachine {
     private _state: StateMachine;
     private _spine: sp.Skeleton;
-    public onShootComplete?: () => void;
+    private _isShooting = false;
 
     constructor(spine: sp.Skeleton) {
         this._spine = spine;
-        this._spine.setCompleteListener(() => {
-            if (this._state.is(CHARACTER_ANIMATION_STATE.SHOOT)) {
+        this._spine.setCompleteListener((entry) => {
+            if (entry.animation.name === CHARACTER_ANIMATION_STATE.SHOOT) {
+                this._isShooting = false;
                 this.idle();
-                this.onShootComplete();
+                return;
             }
+
             if (this._state.is(CHARACTER_ANIMATION_STATE.PORTAL)) {
                 this.idle();
             }
@@ -25,7 +27,6 @@ export class AnimationStateMachine {
             transitions: [
                 { name: 'idle', from: [CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.RUN, CHARACTER_ANIMATION_STATE.PORTAL, CHARACTER_ANIMATION_STATE.SHOOT], to: CHARACTER_ANIMATION_STATE.IDLE },
                 { name: 'run', from: [CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.SHOOT, CHARACTER_ANIMATION_STATE.RUN], to: CHARACTER_ANIMATION_STATE.RUN },
-                { name: 'shoot', from: [CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.SHOOT, CHARACTER_ANIMATION_STATE.RUN], to: CHARACTER_ANIMATION_STATE.SHOOT },
                 { name: 'death', from: '*', to: CHARACTER_ANIMATION_STATE.DEATH },
             ],
 
@@ -38,7 +39,7 @@ export class AnimationStateMachine {
 
         this._spine.setMix(CHARACTER_ANIMATION_STATE.RUN, CHARACTER_ANIMATION_STATE.IDLE, 0.2);
         this._spine.setMix(CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.RUN, 0.3);
-        
+
         this._spine.setMix(CHARACTER_ANIMATION_STATE.RUN, CHARACTER_ANIMATION_STATE.DEATH, 0.5);
         this._spine.setMix(CHARACTER_ANIMATION_STATE.IDLE, CHARACTER_ANIMATION_STATE.DEATH, 0.5);
         this._spine.setMix(CHARACTER_ANIMATION_STATE.SHOOT, CHARACTER_ANIMATION_STATE.DEATH, 0.5);
@@ -50,11 +51,6 @@ export class AnimationStateMachine {
             case CHARACTER_ANIMATION_STATE.PORTAL:
                 this._spine.setAnimation(0, CHARACTER_ANIMATION_STATE.PORTAL, false);
                 this._spine.addAnimation(0, CHARACTER_ANIMATION_STATE.IDLE, true);
-                break;
-
-            case CHARACTER_ANIMATION_STATE.SHOOT:
-                this._spine.setAnimation(0, CHARACTER_ANIMATION_STATE.SHOOT, false);
-                this._spine.setAnimation(1, CHARACTER_ANIMATION_STATE.SHOOT, false);
                 break;
 
             case CHARACTER_ANIMATION_STATE.IDLE:
@@ -71,12 +67,19 @@ export class AnimationStateMachine {
         }
     }
 
-    isShooting(): boolean {
-        return this._state.is(CHARACTER_ANIMATION_STATE.SHOOT);
+    shoot() {
+        if (this._isShooting) {
+            return;
+        }
+        this._isShooting = true;
+        this._spine.clearTracks();
+        this._spine.setAnimation(0, CHARACTER_ANIMATION_STATE.IDLE, true);
+        this._spine.setAnimation(1, CHARACTER_ANIMATION_STATE.SHOOT, false);
     }
 
     isLocked(): boolean {
-        return this._state.is(CHARACTER_ANIMATION_STATE.PORTAL)
+        return this._isShooting
+            || this._state.is(CHARACTER_ANIMATION_STATE.PORTAL)
             || this._state.is(CHARACTER_ANIMATION_STATE.DEATH);
     }
 
@@ -87,7 +90,7 @@ export class AnimationStateMachine {
     }
 
     idle() {
-        if (!this._state.is(CHARACTER_ANIMATION_STATE.IDLE)) {
+        if (this._state.can(CHARACTER_ANIMATION_STATE.IDLE)) {
             this._state.idle();
         }
     }
@@ -95,15 +98,6 @@ export class AnimationStateMachine {
     death() {
         if (!this._state.is(CHARACTER_ANIMATION_STATE.DEATH)) {
             this._state.death();
-        }
-    }
-
-    shoot() {
-        if (this._state.is(CHARACTER_ANIMATION_STATE.RUN)) {
-            this._state.idle();
-        }
-        if (this._state.is(CHARACTER_ANIMATION_STATE.IDLE)) {
-            this._state.shoot();
         }
     }
 } 

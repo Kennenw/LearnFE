@@ -1,26 +1,36 @@
-import { _decorator, Component, Node, Prefab } from 'cc';
+import { _decorator, Component, director, instantiate, Prefab } from 'cc';
+import { EnemyController } from '../Controllers/EnemyController';
 const { ccclass, property } = _decorator;
 
-@ccclass('EnemyPrefab')
-class EnemyPrefab {
-    @property
-    id: string = '';
-
-    @property(Prefab)
-    prefab: Prefab;
-}
 
 @ccclass('EnemyManager')
 export class EnemyManager extends Component {
-    @property([EnemyPrefab])
-    enemys: EnemyPrefab[] = [];
 
-    private _enemys: Map<string, Prefab> = new Map();
-    
+    @property([Prefab])
+    enemies: Prefab[] = [];
+
+    private _prefabs: Map<string, Prefab> = new Map();
+    private _enemies: Map<string, EnemyController> = new Map();
+
     protected onLoad(): void {
-        this.enemys.forEach(enemy => {
-            this._enemys.set(enemy.id, enemy.prefab);
-        })
+        this.enemies.forEach(prefab => {
+            this._prefabs.set(prefab.name, prefab);
+        });
+    }
+
+    pause() {
+        director.pause();
+    }
+
+    resume() {
+        director.resume();
+    }
+
+    spawn(prefabName: string = 'Enemy01') {
+        const prefab = this._prefabs.get(prefabName);
+        const node = instantiate(prefab);
+        node.parent = this.node;
+        this._enemies.set(node.uuid, node.getComponent(EnemyController));
     }
 }
 

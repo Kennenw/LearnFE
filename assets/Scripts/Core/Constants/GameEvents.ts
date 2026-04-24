@@ -1,4 +1,13 @@
+import { Node } from "cc"
+import { CharacterController } from "../../Controllers/CharacterController"
+
 export const GameEvents = {
+    SPAWN_CHARACTER: 'SPAWN:CHARACTER',
+    CHANGED_CHARACTER: 'CHANGED:CHARACTER',
+
+    BULLET_HIT: 'BULLET;HIT',
+
+
     BUTTON_PLAY: 'BUTTON:PLAY',
 
     LOBBY_START: 'LOBBY:START',
@@ -10,10 +19,18 @@ export const GameEvents = {
     POPUP_SETTING_PLAY: 'POPUP:SETTING:PLAY',
     POPUP_SETTING_CLOSE: 'POPUP:SETTING:CLOSE',
     POPUP_PAUSE_PLAY: 'POPUP:PAUSE:PLAY',
-    POPUP_PAUSE_CLOSE: 'POPUP:PAUSE:CLOSE'
+    POPUP_PAUSE_CLOSE: 'POPUP:PAUSE:CLOSE',
+
+
+
 }
 
 export type Events = {
+    [GameEvents.SPAWN_CHARACTER]: string,
+    [GameEvents.SPAWN_CHARACTER]: CharacterController,
+
+    [GameEvents.BULLET_HIT]: {damage: number, target: Node}
+
     [GameEvents.LOBBY_START]: void,
 
     [GameEvents.BUTTON_PLAY]: void,

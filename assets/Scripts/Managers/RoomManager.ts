@@ -1,53 +1,50 @@
 import { _decorator, Component, instantiate, Prefab, Node } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
 import { GameEvents } from '../Core/Constants/GameEvents';
+import { CharacterManager } from './CharacterManager';
+import { EnemyManager } from './EnemyManager';
 const { ccclass, property } = _decorator;
-
-@ccclass('RoomPrefab')
-class RoomPrefab {
-    @property
-    id: string = '';
-
-    @property(Prefab)
-    prefab: Prefab;
-}
 
 @ccclass('RoomManager')
 export class RoomManager extends Component {
-    @property([RoomPrefab])
-    rooms: RoomPrefab[] = [];
+    @property([Prefab])
+    rooms: Prefab[] = [];
 
-    private _rooms: Map<string, Prefab> = new Map();
+    private _prefabs: Map<string, Prefab> = new Map();
     private _currentRoom: Node;
-    private _onRoomPlay: (id: string) => void;
-    private _onQuit: () => void;
+    private _charactorManager: CharacterManager;
+    private _enemyManager: EnemyManager;
 
     protected onLoad(): void {
         this.rooms.forEach(room => {
-            this._rooms.set(room.id, room.prefab);
+            this._prefabs.set(room.name, room);
         })
-        emitter.emit(GameEvents.ROOM_ID, [...this._rooms.keys()]);
-        this._onRoomPlay = this.onRoomPlay.bind(this);
-        emitter.on(GameEvents.ROOM_PLAY, this._onRoomPlay);
-        this._onQuit = this.onQuit.bind(this);
-        emitter.on(GameEvents.ROOM_QUIT, this._onQuit);
+
+        this.loadRoom();
     }
 
-    onDestroy(): void {
-        emitter.off(GameEvents.ROOM_PLAY, this._onRoomPlay);
-        emitter.off(GameEvents.ROOM_QUIT, this._onQuit);
+    loadRoom(name: string = 'Room') {
+        this.play(name);
     }
 
-    onRoomPlay(id: string) {
-        if (this._currentRoom) {
-            this._currentRoom.destroy();
-            this._currentRoom = null;
-        }
-        const target = this._rooms.get(id);
-        const newNode = instantiate(target);
-        newNode.parent = this.node;
-        newNode.active = true;
-        this._currentRoom = newNode;
+    onPause() {
+        this._charactorManager.pause();
+        this._enemyManager.pause();
+    }
+
+    onResume() {
+        this._charactorManager.resume();
+        this._enemyManager.resume();
+    }
+
+    play(name: string) {
+        const prefab = this._prefabs.get(name);
+        this._currentRoom = instantiate(prefab);
+        this._currentRoom.parent = this.node;
+        this._charactorManager = this._currentRoom.getComponentInChildren(CharacterManager);
+        this._enemyManager = this._currentRoom.getComponentInChildren(EnemyManager);
+        this._charactorManager.getMainCharacter();
+        this._enemyManager.spawn();
     }
 
     onQuit() {
