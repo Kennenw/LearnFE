@@ -22,6 +22,10 @@ export class BulletManager extends Component {
         emitter.on(GameEvents.SHOOT, this._onSpawn);
     }
 
+    protected onDestroy(): void {
+        emitter.off(GameEvents.SHOOT, this._onSpawn);
+    }
+
     onSpwan(data: any) {
         const prefab = this._prefabs.get(data.bulletType);
         const node = instantiate(prefab);

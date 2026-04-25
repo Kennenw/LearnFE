@@ -1,4 +1,4 @@
-import { _decorator, Camera, Collider2D, Component, IPhysics2DContact, RigidBody2D, v2, Vec2, view } from 'cc';
+import { _decorator, Collider2D, Component, Contact2DType, RigidBody2D, Vec2, view } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
 import { GameEvents } from '../Core/Constants/GameEvents';
 const { ccclass, property } = _decorator;
@@ -19,12 +19,21 @@ export class BulletController extends Component {
     protected onLoad(): void {
         this._collider = this.node.getComponent(Collider2D);
         this._rigidBody2D = this.node.getComponent(RigidBody2D);
+        this._collider.enabled = false;
+        this._collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
+
+    protected start(): void {
+        this.node.setScale(this.node.scale.x * this.direction, this.node.scale.y);
     }
 
     protected update(dt: number): void {
-        this._collider.on('begin-contact', this.onBeginContact, this);
         this.move();
         this.destruction();
+    }
+
+    protected onDestroy(): void {
+        this._collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
 
     destruction() {
@@ -35,12 +44,11 @@ export class BulletController extends Component {
         }
     }
 
-    onBeginContact(contact: IPhysics2DContact, selfCollider, otherCollider) {
-        emitter.emit(GameEvents.BULLET_HIT, {
+    onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+        emitter.emit(GameEvents.ENEMY_TAKE_DAMAGE, {
             damage: this.damage,
-            target: otherCollider
+            target: otherCollider.node
         })
-        console.log('first')
         this.node.destroy();
     }
 

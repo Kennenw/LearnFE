@@ -63,8 +63,8 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 0.5,
-      "y": 0.5,
+      "x": 0.2,
+      "y": 0.2,
       "z": 1
     },
     "_mobility": 0,
@@ -246,7 +246,8 @@
     "__prefab": {
       "__id__": 11
     },
-    "speed": 300,
+    "hp": 100,
+    "speed": 10,
     "positionShoot": {
       "__id__": 2
     },
@@ -270,7 +271,7 @@
     "tag": 0,
     "_group": 2,
     "_density": 1,
-    "_sensor": false,
+    "_sensor": true,
     "_friction": 0.2,
     "_restitution": 0,
     "_offset": {
@@ -301,9 +302,9 @@
       "__id__": 15
     },
     "tag": 0,
-    "_group": 1,
+    "_group": 2,
     "_density": 1,
-    "_sensor": false,
+    "_sensor": true,
     "_friction": 0.2,
     "_restitution": 0,
     "_offset": {
@@ -334,9 +335,9 @@
       "__id__": 17
     },
     "tag": 0,
-    "_group": 1,
+    "_group": 2,
     "_density": 1,
-    "_sensor": false,
+    "_sensor": true,
     "_friction": 0.2,
     "_restitution": 0,
     "_offset": {
@@ -366,7 +367,7 @@
     "bullet": false,
     "awakeOnLoad": true,
     "_group": 2,
-    "_type": 1,
+    "_type": 2,
     "_allowSleep": true,
     "_gravityScale": 0,
     "_linearDamping": 0,
@@ -377,7 +378,7 @@
       "y": 0
     },
     "_angularVelocity": 0,
-    "_fixedRotation": false,
+    "_fixedRotation": true,
     "_id": ""
   },
   {

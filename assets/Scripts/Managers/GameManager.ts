@@ -5,6 +5,7 @@ const { ccclass } = _decorator;
 export class GameManager extends Component {
     protected onLoad(): void {
         PhysicsSystem2D.instance.enable = true;
+        //PhysicsSystem2D.instance.debugDrawFlags = 1;
     }
 }
 

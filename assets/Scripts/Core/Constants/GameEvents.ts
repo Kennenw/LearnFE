@@ -5,8 +5,10 @@ export const GameEvents = {
     SPAWN_CHARACTER: 'SPAWN:CHARACTER',
     CHANGED_CHARACTER: 'CHANGED:CHARACTER',
 
-    BULLET_HIT: 'BULLET;HIT',
+    ENEMY_TAKE_DAMAGE: 'ENEMY:TAKE:DAMAGE',
     SHOOT: 'SHOOT',
+
+    PLAYER_TAKE_DAMAGE: 'PLAYER:TAKE:DAMAGE',
 
     BUTTON_PLAY: 'BUTTON:PLAY',
 
@@ -30,7 +32,9 @@ export type Events = {
     [GameEvents.SPAWN_CHARACTER]: CharacterController,
     [GameEvents.SHOOT]: { bulletType: string, direction: number, position: Vec3 },
 
-    [GameEvents.BULLET_HIT]: { damage: number, target: Node }
+    [GameEvents.ENEMY_TAKE_DAMAGE]: { damage: number, target: Node },
+    [GameEvents.PLAYER_TAKE_DAMAGE]: number,
+
 
     [GameEvents.LOBBY_START]: void,
 
