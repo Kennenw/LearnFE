@@ -1,4 +1,4 @@
-import { _decorator, Collider2D, Component, Contact2DType, director, instantiate, IPhysics2DContact, Label, Node, Prefab, ProgressBar, RigidBody2D, Sprite, tween, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, Collider2D, Component, instantiate, Label, Node, Prefab, ProgressBar, Sprite, tween, v3, Vec3 } from 'cc';
 import { GameEvents } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
 const { ccclass, property } = _decorator;
@@ -26,8 +26,12 @@ export class EnemyController extends Component {
     @property
     attackCooldown: number = 1;
 
+    @property
+    score: number = 10;
+
     private _direction: Vec3 = new Vec3();
     private _attackCooldown: number = this.attackCooldown;
+    private _isDeath: boolean = false;
 
     calculateDamage(damge: number) {
         this._updateProgressBar(damge);
@@ -82,6 +86,9 @@ export class EnemyController extends Component {
     }
 
     private _attack(targetWorldPos: Vec3) {
+        if (this._isDeath) {
+            return;
+        }
         const startLocalPos = this.node.position.clone();
         const selfWorldPos = this.node.worldPosition.clone();
 
@@ -94,33 +101,40 @@ export class EnemyController extends Component {
         tween(this.node)
             .sequence(
                 tween(this.node).to(0.18, { position: startLocalPos.clone().add(v3(lungeDistance * lungeDirection, 0, 0)) }, { easing: 'quadOut' }),
+                emitter.emit(GameEvents.PLAYER_TAKE_DAMAGE, {
+                    damage: this.damageAttack
+                }),
                 tween(this.node).to(0.22, { position: startLocalPos }, { easing: 'quadIn' })
             )
             .start();
 
-        emitter.emit(GameEvents.PLAYER_TAKE_DAMAGE, {
-            damage: this.damageAttack
-        });
+
     }
 
     private _updateProgressBar(damage: number) {
         this.hp -= damage;
         this.hp = Math.max(this.hp, 0);
         if (this.hp === 0) {
-            const colliders = this.node.getComponents(Collider2D);
-            colliders.forEach(collider => {
-                collider.destroy();
-            });
-            this.speed = 0;
-            const sprite = this.node.getComponent(Sprite);
-            tween(sprite.color)
-                .by(1, { a: 0 })
-                .call(() => {
-                    this.node.destroy();
-                })
-                .start();
+            this._death();
         }
         this.progressBar.progress = this.hp / 100;
+    }
+
+    private _death() {
+        emitter.emit(GameEvents.CALCULATE_SCORE, { score: this.score })
+        this._isDeath = true;
+        const colliders = this.node.getComponents(Collider2D);
+        colliders.forEach(collider => {
+            collider.destroy();
+        });
+        this.speed = 0;
+        const sprite = this.node.getComponent(Sprite);
+        tween(sprite.color)
+            .by(1, { a: 0 })
+            .call(() => {
+                this.node.destroy();
+            })
+            .start();
     }
 
     private _showDamage(damage: number) {

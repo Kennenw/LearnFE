@@ -1,4 +1,4 @@
-import { _decorator, Component, director, instantiate, Prefab } from 'cc';
+import { _decorator, Component, instantiate, Prefab } from 'cc';
 import { CharacterController } from '../Controllers/CharacterController';
 import { emitter } from '../Core/Events/Emitter';
 import { GameEvents } from '../Core/Constants/GameEvents';
@@ -28,14 +28,6 @@ export class CharacterManager extends Component {
             return this._character;
         } return this._spawn(name);
 
-    }
-
-    pause() {
-        director.pause();
-    }
-
-    resume() {
-        director.resume();
     }
 
     private _spawn(prefabName: string): CharacterController {

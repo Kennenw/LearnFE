@@ -413,11 +413,12 @@
       "__uuid__": "fa0a5eeb-c5b9-428f-9303-a40d906b964b",
       "__expectedType__": "cc.Prefab"
     },
-    "damageAttack": 20,
+    "damageAttack": 100,
     "speed": 50,
     "hp": 100,
     "attackRange": 100,
     "attackCooldown": 5,
+    "score": 10,
     "_id": ""
   },
   {

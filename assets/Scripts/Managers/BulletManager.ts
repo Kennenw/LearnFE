@@ -1,4 +1,3 @@
-import { director } from 'cc';
 import { _decorator, Component, instantiate, Node, Prefab, Vec3 } from 'cc';
 import { BulletController } from '../Controllers/BulletController';
 import { emitter } from '../Core/Events/Emitter';
@@ -35,14 +34,6 @@ export class BulletManager extends Component {
         const controller = node.getComponent(BulletController);
         controller.direction = data.direction;
         this._bullet.set(node.uuid, controller);
-    }
-
-    pause() {
-        director.pause();
-    }
-
-    resume() {
-        director.resume();
     }
 }
 

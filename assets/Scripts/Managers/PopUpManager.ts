@@ -1,78 +1,139 @@
-import { _decorator, BlockInputEvents, Component, instantiate, Node, Prefab } from 'cc';
-import { emitter } from '../Core/Events/Emitter';
-import { GameEvents } from '../Core/Constants/GameEvents';
-import { FreezeNode } from '../Utils/FreezeNode';
+import { _decorator, BlockInputEvents, Component, director, Label, Node, Toggle } from 'cc';
+import { AudioManager } from './AudioManager';
+
 const { ccclass, property } = _decorator;
-
-@ccclass('SettingPrefab')
-class PopUpPrefab {
-    @property
-    id: string = '';
-
-    @property(Prefab)
-    prefab: Prefab;
-}
 
 @ccclass('PopUpManager')
 export class PopUpManager extends Component {
 
-    @property([PopUpPrefab])
-    popUps: PopUpPrefab[] = [];
+    @property(Node)
+    pausePopup: Node;
 
     @property(Node)
-    backgound: Node;
+    settingPopup: Node;
 
-    private _popUps: Map<string, Prefab> = new Map();
-    private _onActive: (id: string) => void;
-    private _onInActive: () => void;
-    private _currentPopUp: Node;
+    @property(Node)
+    losePopup: Node;
+
+    @property(Node)
+    winPopup: Node;
+
+    @property(Label)
+    scoreWin: Label
+
+    @property(Label)
+    scoreLose: Label
+
+    @property(Toggle)
+    musicToggle: Toggle
+
+    @property(Toggle)
+    pfx: Toggle
+
+    private static _instance: PopUpManager;
+
+    static get instance() {
+        return this._instance;
+    }
 
     protected onLoad(): void {
-        this.popUps.forEach((popUp) => {
-            this._popUps.set(popUp.id, popUp.prefab);
-        });
-
-        this._onActive = this.onActive.bind(this);
-        emitter.on(GameEvents.POPUP_SETTING_PLAY, this._onActive);
-        emitter.on(GameEvents.POPUP_PAUSE_PLAY, this._onActive);
-        this._onInActive = this.onInActive.bind(this);
-        emitter.on(GameEvents.POPUP_PAUSE_CLOSE, this._onInActive);
-        emitter.on(GameEvents.POPUP_SETTING_CLOSE, this._onInActive);
-        emitter.on(GameEvents.ROOM_QUIT, this._onInActive);
+        if (PopUpManager._instance) {
+            this.node.destroy();
+            return;
+        }
+        PopUpManager._instance = this;
+        director.addPersistRootNode(this.node);
+        this.musicToggle.node.on(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
+        this.pfx.node.on(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
     }
 
     protected onDestroy(): void {
-        emitter.off(GameEvents.POPUP_SETTING_PLAY, this._onActive);
-        emitter.off(GameEvents.POPUP_PAUSE_PLAY, this._onActive);
-        emitter.off(GameEvents.POPUP_PAUSE_CLOSE, this._onInActive);
-        emitter.off(GameEvents.POPUP_SETTING_CLOSE, this._onInActive);
-        emitter.off(GameEvents.ROOM_QUIT, this._onInActive);
+        this.musicToggle.node.off(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
+        this.pfx.node.off(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
     }
 
-    onActive(id: string) {
-        if (this._currentPopUp) {
-            this._currentPopUp.destroy();
-            this._currentPopUp = null;
+    onMusicChanged(toggle: Toggle) {
+        AudioManager.instance.music.volume = toggle.isChecked ? 1 : 0;
+    }
+
+    onSfxChanged(toggle: Toggle) {
+        AudioManager.instance.pfx.volume = toggle.isChecked ? 1 : 0;
+    }
+
+    showPause() {
+        this.pausePopup.active = true;
+        this._addBlockEvents(this.pausePopup);
+        director.pause();
+    }
+
+    hidePause() {
+        this.pausePopup.active = false;
+        this._removeBlockEvents(this.pausePopup);
+        director.resume();
+    }
+
+    showSetting() {
+        this._addBlockEvents(this.settingPopup);
+        this.settingPopup.active = true;
+        director.pause();
+
+    }
+
+    hideAll() {
+        this.hidePause();
+        this.hideLose();
+        this.hideSetting();
+        this.hideWin();
+    }
+
+    hideSetting() {
+        this.settingPopup.active = false;
+        this._removeBlockEvents(this.settingPopup);
+        director.resume();
+    }
+
+    showWin(score: string) {
+        this.winPopup.active = true;
+        this.scoreWin.string = score;
+        this._addBlockEvents(this.winPopup);
+        director.pause();
+    }
+
+    hideWin() {
+        this.winPopup.active = false;
+        this._removeBlockEvents(this.winPopup);
+        director.resume();
+    }
+
+    showLose(score: string) {
+        this.losePopup.active = true;
+        this.scoreLose.string = score;
+        this._addBlockEvents(this.losePopup);
+        director.pause();
+    }
+
+    hideLose() {
+        this.losePopup.active = false;
+        this._removeBlockEvents(this.losePopup);
+        director.resume();
+    }
+
+
+    private _addBlockEvents(node: Node) {
+        if (node.getComponents(BlockInputEvents)) {
+            return;
         }
-        if (!this.node.getComponent(BlockInputEvents)) {
-            this.node.addComponent(BlockInputEvents);
+        node.addComponent(BlockInputEvents);
+    }
+
+    private _removeBlockEvents(node: Node) {
+        const components = node.getComponents(BlockInputEvents)
+        if (components) {
+            components.forEach(component => {
+                component.destroy();
+            });
         }
-        this.backgound.active = true;
-        const target = this._popUps.get(id);
-        const node = instantiate(target);
-        node.parent = this.node;
-        node.active = true;
-        this._currentPopUp = node;
-
     }
 
-    onInActive() {
-        this.backgound.active = false;
-        this._currentPopUp.destroy();
-        this._currentPopUp = null;
-        const blockInputEvent = this.node.getComponent(BlockInputEvents);
-        blockInputEvent.destroy();
-        FreezeNode.resumeGame();
-    }
 }
 

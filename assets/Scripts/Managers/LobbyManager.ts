@@ -1,6 +1,8 @@
-import { _decorator, Component, Sprite } from 'cc';
+import { _decorator, Button, Component, Label, Sprite } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
 import { GameEvents } from '../Core/Constants/GameEvents';
+import { SceneManager } from './SceneManager';
+import { PopUpManager } from './PopUpManager';
 
 const { ccclass, property } = _decorator;
 
@@ -10,38 +12,54 @@ export class LobbyManager extends Component {
     sprite: Sprite;
 
     private _onPlayGame: () => void;
-    private _onRoomKey: (data: string[]) => void;
-    private _onLobby: () => void;
-    private _roomIds: string[] = [];
+    private _onPlaySetting: () => void;
+    private _onCloseSetting: () => void;
+    private _popUp: PopUpManager;
+    private _scene: SceneManager;
 
     protected onLoad(): void {
-        this._onRoomKey = this.onRoomKey.bind(this);
-        emitter.on(GameEvents.ROOM_ID, this._onRoomKey);
-
+        this._scene = SceneManager.instance;
+        this._popUp = PopUpManager.instance;
         this._onPlayGame = this.onPlayGame.bind(this);
         emitter.on(GameEvents.BUTTON_PLAY, this._onPlayGame);
-
-        this._onLobby = this.onLobby.bind(this);
-        emitter.on(GameEvents.LOBBY_START, this._onLobby);
+        this._onPlaySetting = this.onPlaySetting.bind(this);
+        emitter.on(GameEvents.SETTING_PLAY, this._onPlaySetting);
+        this._onCloseSetting = this.onCloseSetting.bind(this);
+        emitter.on(GameEvents.SETTING_CLOSE, this._onCloseSetting);
     }
 
     protected onDestroy(): void {
-        emitter.off(GameEvents.ROOM_ID, this._onRoomKey);
         emitter.off(GameEvents.BUTTON_PLAY, this._onPlayGame);
-        emitter.off(GameEvents.LOBBY_START, this._onLobby);
+        emitter.off(GameEvents.SETTING_PLAY, this._onPlaySetting);
+        emitter.off(GameEvents.SETTING_CLOSE, this._onCloseSetting);
     }
 
     onLobby() {
         this.node.active = true;
     }
 
-    onRoomKey(data: string[]) {
-        this._roomIds = data;
+    onPlayGame() {
+        this._scene.loadScene('Room');
     }
 
-    onPlayGame() {
-        this.node.active = false;
-        emitter.emit(GameEvents.ROOM_PLAY, this._roomIds[0]);
+    onPlaySetting() {
+        this._popUp.showSetting();
+        this._enableButton(false);
+    }
+
+    onCloseSetting() {
+        this._popUp.hideSetting();
+        this._enableButton();
+    }
+
+    private _enableButton(isEnable: boolean = true) {
+        this.node.getComponentsInChildren(Button).forEach((button => {
+            if (isEnable) {
+                button.onEnable();
+            } else {
+                button.onDisable();
+            }
+        }))
     }
 }
 

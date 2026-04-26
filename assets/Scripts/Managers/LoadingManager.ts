@@ -1,0 +1,52 @@
+import { _decorator, Component, director, ProgressBar, Node } from 'cc';
+import { SceneManager } from './SceneManager';
+const { ccclass, property } = _decorator;
+
+@ccclass('LoadingManager')
+export class LoadingManager extends Component {
+
+    @property(ProgressBar)
+    progressBar: ProgressBar
+
+    @property([Node])
+    backgrounds: Node[] = [];
+
+    private static _instance: LoadingManager;
+
+    static get instance() {
+        return this._instance;
+    }
+
+    protected onLoad(): void {
+        if (!LoadingManager._instance) {
+            LoadingManager._instance = this;
+        }
+        this._randomBackground();
+    }
+
+    protected start(): void {
+        this.progressBar.progress = 0;
+        const target = SceneManager.nextScene || "Lobby";
+        director.preloadScene(target, (completed, total) => {
+            const progress = completed / total;
+            this.progressBar.progress = Math.max(this.progressBar.progress, progress);
+        }, () => {
+            this.scheduleOnce(() => {
+                director.loadScene(target);
+            }, 0.3);
+        })
+    }
+
+    _randomBackground() {
+        const total = this.backgrounds.length;
+        const random = Math.floor(Math.random() * (total));
+        this.backgrounds.forEach(background => {
+            if (this.backgrounds[random] === background) {
+                background.active = true;
+                return;
+            }
+        });
+    }
+}
+
+

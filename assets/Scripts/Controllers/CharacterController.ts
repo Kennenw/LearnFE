@@ -1,7 +1,8 @@
-import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, IPhysics2DContact, Collider2D, director, Camera, view } from 'cc';
+import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, director, Camera, view } from 'cc';
 import { AnimationStateMachine } from '../Core/StateMachines/AnimationStateMachine';
 import { emitter } from '../Core/Events/Emitter';
 import { GameEvents } from '../Core/Constants/GameEvents';
+import { AudioManager } from '../Managers/AudioManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('CharacterController')
@@ -45,6 +46,7 @@ export class CharacterController extends Component {
                 return;
             }
             this._velocity.set(0, 0);
+            AudioManager.instance.playPfx();
             this._animation.shoot();
             emitter.emit(GameEvents.SHOOT, { bulletType: 'BulletFire', direction: this._direction > 0 ? 1 : -1, position: this.positionShoot.worldPosition });
         }

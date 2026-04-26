@@ -25,6 +25,10 @@ export class EnemyManager extends Component {
         emitter.on(GameEvents.ENEMY_TAKE_DAMAGE, this._onHit);
     }
 
+    protected onDestroy(): void {
+        emitter.off(GameEvents.ENEMY_TAKE_DAMAGE, this._onHit);
+    }
+
     protected update(dt: number): void {
 
         if (!this._target) {
@@ -42,14 +46,6 @@ export class EnemyManager extends Component {
         this._enemies.forEach(enemy => {
             enemy.move(dt, target);
         });
-    }
-
-    pause() {
-        director.pause();
-    }
-
-    resume() {
-        director.resume();
     }
 
     spawn(playerWorldPosition: Vec3, prefabName: string = 'Enemy01'): Node {

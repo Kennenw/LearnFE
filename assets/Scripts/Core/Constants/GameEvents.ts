@@ -6,25 +6,21 @@ export const GameEvents = {
     CHANGED_CHARACTER: 'CHANGED:CHARACTER',
 
     ENEMY_TAKE_DAMAGE: 'ENEMY:TAKE:DAMAGE',
+    CALCULATE_SCORE: 'CALCULATE:SCORE',
     SHOOT: 'SHOOT',
 
     PLAYER_TAKE_DAMAGE: 'PLAYER:TAKE:DAMAGE',
 
     BUTTON_PLAY: 'BUTTON:PLAY',
 
-    LOBBY_START: 'LOBBY:START',
+    SETTING_PLAY: 'SETTING:PLAY',
+    SETTING_CLOSE: 'SETTING:CLOSE',
+    PAUSE_PLAY: 'PAUSE:PLAY',
+    PAUSE_CLOSE: 'PAUSE:CLOSE',
 
     ROOM_PLAY: 'ROOM:PLAY',
-    ROOM_ID: 'ROOM:ID',
     ROOM_QUIT: 'ROOM:QUIT',
-
-    POPUP_SETTING_PLAY: 'POPUP:SETTING:PLAY',
-    POPUP_SETTING_CLOSE: 'POPUP:SETTING:CLOSE',
-    POPUP_PAUSE_PLAY: 'POPUP:PAUSE:PLAY',
-    POPUP_PAUSE_CLOSE: 'POPUP:PAUSE:CLOSE',
-
-
-
+    ROOM_RESET: 'ROOM:RESET',
 }
 
 export type Events = {
@@ -33,20 +29,18 @@ export type Events = {
     [GameEvents.SHOOT]: { bulletType: string, direction: number, position: Vec3 },
 
     [GameEvents.ENEMY_TAKE_DAMAGE]: { damage: number, target: Node },
-    [GameEvents.PLAYER_TAKE_DAMAGE]: number,
-
-
-    [GameEvents.LOBBY_START]: void,
+    [GameEvents.PLAYER_TAKE_DAMAGE]: { damage: number },
 
     [GameEvents.BUTTON_PLAY]: void,
+    [GameEvents.CALCULATE_SCORE]: { score: number },
 
-    [GameEvents.POPUP_SETTING_PLAY]: string,
-    [GameEvents.POPUP_PAUSE_PLAY]: string,
-    [GameEvents.POPUP_SETTING_CLOSE]: void,
-    [GameEvents.POPUP_PAUSE_CLOSE]: void,
+    [GameEvents.SETTING_PLAY]: void,
+    [GameEvents.PAUSE_PLAY]: void,
+    [GameEvents.SETTING_CLOSE]: void,
+    [GameEvents.PAUSE_CLOSE]: void,
 
     [GameEvents.ROOM_PLAY]: string,
-    [GameEvents.ROOM_ID]: string[],
     [GameEvents.ROOM_QUIT]: void,
+    [GameEvents.ROOM_RESET]: void,
 }
 

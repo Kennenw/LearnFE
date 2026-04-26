@@ -19,7 +19,6 @@ export class BulletController extends Component {
     protected onLoad(): void {
         this._collider = this.node.getComponent(Collider2D);
         this._rigidBody2D = this.node.getComponent(RigidBody2D);
-        this._collider.enabled = false;
         this._collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
 
