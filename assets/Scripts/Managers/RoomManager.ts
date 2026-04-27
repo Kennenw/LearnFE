@@ -57,7 +57,8 @@ export class RoomManager extends Component {
     }
 
     onPlayPause() {
-        this._popUp.showPause();
+        const wave = this._currentRoom.getComponent(RoomController).currentWave;
+        this._popUp.showPause(wave);
         if (!this.node.getComponent(BlockInputEvents)) {
             this.node.addComponent(BlockInputEvents);
         }

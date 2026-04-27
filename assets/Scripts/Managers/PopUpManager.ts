@@ -30,6 +30,9 @@ export class PopUpManager extends Component {
     @property(Toggle)
     pfx: Toggle
 
+    @property(Label)
+    waveLabel: Label
+
     private static _instance: PopUpManager;
 
     static get instance() {
@@ -53,16 +56,19 @@ export class PopUpManager extends Component {
     }
 
     onMusicChanged(toggle: Toggle) {
+        AudioManager.instance.playPfx();
         AudioManager.instance.music.volume = toggle.isChecked ? 1 : 0;
     }
 
     onSfxChanged(toggle: Toggle) {
+        AudioManager.instance.playPfx();
         AudioManager.instance.pfx.volume = toggle.isChecked ? 1 : 0;
     }
 
-    showPause() {
-        this.pausePopup.active = true;
+    showPause(wave: string) {
         this._addBlockEvents(this.pausePopup);
+        this.waveLabel.string = `${wave}`;
+        this.pausePopup.active = true;
         director.pause();
     }
 

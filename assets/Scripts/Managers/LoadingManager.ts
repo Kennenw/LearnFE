@@ -1,4 +1,4 @@
-import { _decorator, Component, director, ProgressBar, Node } from 'cc';
+import { _decorator, Component, director, ProgressBar, Node, Label } from 'cc';
 import { SceneManager } from './SceneManager';
 const { ccclass, property } = _decorator;
 
@@ -10,6 +10,9 @@ export class LoadingManager extends Component {
 
     @property([Node])
     backgrounds: Node[] = [];
+
+    @property(Label)
+    loading: Label
 
     private static _instance: LoadingManager;
 
@@ -30,6 +33,7 @@ export class LoadingManager extends Component {
         director.preloadScene(target, (completed, total) => {
             const progress = completed / total;
             this.progressBar.progress = Math.max(this.progressBar.progress, progress);
+            this.loading.string = `Loading... ${Math.floor(this.progressBar.progress * 100)}%`
         }, () => {
             this.scheduleOnce(() => {
                 director.loadScene(target);

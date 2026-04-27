@@ -32,6 +32,7 @@ export class EnemyController extends Component {
     private _direction: Vec3 = new Vec3();
     private _attackCooldown: number = this.attackCooldown;
     private _isDeath: boolean = false;
+    private _maxHp: number = this.hp;
 
     calculateDamage(damge: number) {
         this._updateProgressBar(damge);
@@ -54,7 +55,7 @@ export class EnemyController extends Component {
         if (Math.abs(this._direction.x) > 0.01) {
             const currentDirection = Math.abs(this.node.scale.x);
             this.node.setScale(
-                this._direction.x > 0 ? currentDirection : -currentDirection,
+                this._direction.x > 0 ? -currentDirection : currentDirection,
                 this.node.scale.y
             );
         }
@@ -117,7 +118,7 @@ export class EnemyController extends Component {
         if (this.hp === 0) {
             this._death();
         }
-        this.progressBar.progress = this.hp / 100;
+        this.progressBar.progress = this.hp / this._maxHp;
     }
 
     private _death() {
@@ -145,7 +146,7 @@ export class EnemyController extends Component {
         if (Math.abs(this._direction.x) > 0.01) {
             const currentDirection = Math.abs(node.scale.x);
             node.setScale(
-                this._direction.x > 0 ? currentDirection : -currentDirection,
+                this._direction.x > 0 ? -currentDirection : currentDirection,
                 node.scale.y
             );
         }

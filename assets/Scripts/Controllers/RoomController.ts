@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Label, ProgressBar } from 'cc';
+import { _decorator, Button, Component, Label, ProgressBar, Node } from 'cc';
 import { CharacterManager } from '../Managers/CharacterManager';
 import { EnemyManager } from '../Managers/EnemyManager';
 import { CharacterController } from './CharacterController';
@@ -16,25 +16,35 @@ export class RoomController extends Component {
     @property(Label)
     time: Label
 
-    @property
-    maxTime: number = 120
-
-    @property(Label)
-    wave: Label
+    @property([Label])
+    waves: Label[] = [];
 
     @property(Label)
     score: Label
+
+    @property(Node)
+    wavePopup: Node
+
+    @property(Label)
+    totalEnemy: Label
+
+    @property([Node])
+    imagePopup: Node[] = [];
 
     private _charactorManager: CharacterManager;
     private _enemyManager: EnemyManager;
     private _character: CharacterController;
     private _onCharacterHit: (data: any) => void;
     private _onCalculatePoint: (data: any) => void;
-    private _isWave: boolean = false
     private _currentHp: number;
     private _currentScore: number = 0;
     private _popUp: PopUpManager;
     private _totalEnemy: number = 0;
+    private _waveTime: number = 0;
+    private _listEnemy: string[] = ['Enemy01', 'Enemy02', 'Enemy03'];
+    private _isWave: boolean = false;
+    currentWave: string = '';
+    private _isBoss: boolean;
 
     init() {
         this._popUp = PopUpManager.instance;
@@ -42,13 +52,60 @@ export class RoomController extends Component {
         this._enemyManager = this.node.getComponentInChildren(EnemyManager);
         this._character = this._charactorManager.getMainCharacter();
         this._enemyManager._target = this._character.node;
-        this.wave.string = WAVE_ROOM.WAVE_01;
+        this.waves.forEach((wave) => {
+            wave.string = WAVE_ROOM.WAVE_01;
+        })
         this._currentHp = this._character.hp;
 
         this._onCharacterHit = this.onCharacterHit.bind(this);
         emitter.on(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
         this._onCalculatePoint = this.onCalculatePoint.bind(this);
         emitter.on(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
+        this.totalEnemy.string = `${this.totalEnemy}`;
+        this.score.string = `SCORE:  ${this._currentScore}`;
+        this.currentWave = WAVE_ROOM.WAVE_01;
+    }
+
+    protected start(): void {
+        this._createWave(2, 60, 1, WAVE_ROOM.WAVE_01);
+    }
+
+    protected update(dt: number): void {
+        this.totalEnemy.string = `${this._totalEnemy}`
+        if (this._currentHp <= 0) {
+            return;
+        }
+        this._waveTime -= dt / 2;
+        this.time.string = Math.max(0, Math.floor(this._waveTime)).toString();
+
+        if (this._waveTime <= 0) {
+            this._waveTime = 0;
+            this._lose();
+            return;
+        }
+
+        if (this._isBoss) {
+            this._win();
+            return;
+        }
+
+        if (!this._isWave && this._totalEnemy <= 0) {
+
+            if (this.currentWave === WAVE_ROOM.WAVE_01) {
+                this._createWave(5, 80, 2, WAVE_ROOM.WAVE_02);
+                return;
+            }
+
+            if (this.currentWave === WAVE_ROOM.WAVE_02) {
+                this.bossWave(15, WAVE_ROOM.WAVE_BOSS);
+                return;
+            }
+
+            if (this.currentWave === WAVE_ROOM.WAVE_BOSS) {
+                this._win();
+                return;
+            }
+        }
     }
 
     protected onDestroy(): void {
@@ -57,36 +114,108 @@ export class RoomController extends Component {
     }
 
     onCalculatePoint(data: any) {
+        this._isBoss = data.isBoss;
         this._totalEnemy--;
         this._currentScore += data.score;
-        this.score.string = `${this._currentScore}`;
+        this.score.string = `SCORE:  ${this._currentScore}`;
     }
 
-    createWave() {
-        if (this._isWave === false) {
-            this._isWave = true;
-            this.schedule(() => {
-                this._enemyManager.spawn(this._character.node.worldPosition);
-            }, 5, 10);
-            this._totalEnemy += 9;
-        }
+    private _createWave(totalEnemy: number, totalTime: number, wave: number, wavelabel: string) {
+        this._waveTime = totalTime;
+        this.currentWave = wavelabel;
+        let count = 0;
+        this._isWave = true;
+        this.waves.forEach(wave => {
+            wave.string = wavelabel;
+        });
+
+        this.scheduleOnce(() => {
+            this.imagePopup.forEach((image) => {
+                image.active = image.name === this._listEnemy[wave - 1];
+                if (image.active) {
+                    this.wavePopup.active = true;
+                }
+            })
+        }, 1);
+
+        this.scheduleOnce(() => {
+            this.wavePopup.active = false;
+
+            this.imagePopup.forEach((image) => {
+                image.active = false;
+            });
+
+        }, 3);
+
+        const spawnFunction = () => {
+            this._enemyManager.spawn(
+                this._character.node.worldPosition,
+                this._listEnemy[wave - 1]
+            );
+
+            this._totalEnemy++;
+            count++;
+
+            if (count >= totalEnemy) {
+                this.unschedule(spawnFunction);
+                this._isWave = false;
+            }
+        };
+        this.schedule(spawnFunction, 2, totalEnemy - 1, 3);
     }
 
-    protected update(dt: number): void {
-        this._win();
-        if (this._currentHp <= 0) {
-            return;
-        }
-        this.maxTime -= dt / 2;
-        this.time.string = Math.max(0, Math.floor(this.maxTime)).toString();
-        this.createWave();
+    bossWave(totalEnemy: number, wavelabel: string) {
+        this._waveTime = 999999;
+        let count = 0;
+        this.currentWave = wavelabel;
+        this._isWave = true;
+        this.waves.forEach(wave => {
+            wave.string = wavelabel;
+        });
+
+        this.scheduleOnce(() => {
+            this.imagePopup.forEach((image) => {
+                image.active = image.name === this._listEnemy[2];
+                if (image.active) {
+                    this.wavePopup.active = true;
+                }
+            })
+        }, 1);
+
+        this.scheduleOnce(() => {
+            this.wavePopup.active = false;
+            this.imagePopup.forEach((image) => {
+                image.active = false;
+            });
+            this._enemyManager.spawn(this._character.node.worldPosition, this._listEnemy[2]);
+            this._totalEnemy++;
+        }, 3);
+
+        const spawnFunction = () => {
+            this._enemyManager.spawn(
+                this._character.node.worldPosition,
+                this._randomEnemy(2)
+            );
+
+            this._totalEnemy++;
+            count++;
+
+            if (count >= totalEnemy) {
+                this.unschedule(spawnFunction);
+                this._isWave = false;
+            }
+        };
+
+        this.schedule(spawnFunction, 1, totalEnemy - 1, 1);
     }
 
     onCharacterHit(data: any) {
         this._updateProgressBar(data.damage);
         if (this.progressBar.progress <= 0) {
             this._character.death();
-            this._lose();
+            this.scheduleOnce(() => {
+                this._lose();
+            }, 1)
         }
     }
 
@@ -118,12 +247,18 @@ export class RoomController extends Component {
     }
 
     private _win() {
-        if (this._totalEnemy < 0 || this.maxTime <= 0) {
+        if (this._totalEnemy <= 0 && !this._isWave) {
             emitter.off(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
             emitter.off(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
             this._enableButton(false);
+            this.unscheduleAllCallbacks();
             this._popUp.showWin(this._currentScore.toString());
         }
+    }
+
+    private _randomEnemy(types: number): string {
+        const enemy = Math.floor(Math.random() * types);
+        return this._listEnemy[enemy];
     }
 }
 

@@ -32,7 +32,7 @@ export type Events = {
     [GameEvents.PLAYER_TAKE_DAMAGE]: { damage: number },
 
     [GameEvents.BUTTON_PLAY]: void,
-    [GameEvents.CALCULATE_SCORE]: { score: number },
+    [GameEvents.CALCULATE_SCORE]: { score: number, isBoss: boolean },
 
     [GameEvents.SETTING_PLAY]: void,
     [GameEvents.PAUSE_PLAY]: void,
