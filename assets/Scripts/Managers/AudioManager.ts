@@ -1,13 +1,16 @@
-import { _decorator, AudioSource, Component, director } from 'cc';
+import { _decorator, AudioSource, Component, director, Slider } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('AudioManager')
 export class AudioManager extends Component {
     @property(AudioSource)
-    pfx: AudioSource
+    sfx: AudioSource
 
     @property(AudioSource)
     music: AudioSource
+
+    @property(Slider)
+    musicSlider: Slider
 
     private static _instance: AudioManager;
 
@@ -22,20 +25,25 @@ export class AudioManager extends Component {
         }
     }
 
+    onSlideMusic() {
+        this.music.volume = this.musicSlider.progress;
+        this.sfx.volume = this.musicSlider.progress;
+    }
+
     playMusic() {
         this.music.play();
     }
 
-    playPfx() {
-        this.pfx.play();
+    playSfx() {
+        this.sfx.play();
     }
 
     stopMusic() {
         this.music.pause();
     }
 
-    stopPfx() {
-        this.pfx.pause();
+    stopSfx() {
+        this.sfx.pause();
     }
 }
 

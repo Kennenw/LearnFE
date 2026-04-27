@@ -1,4 +1,4 @@
-import { _decorator, Component, director, Node, PhysicsSystem2D } from 'cc';
+import { _decorator, Component, director, PhysicsSystem2D } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('SceneManager')

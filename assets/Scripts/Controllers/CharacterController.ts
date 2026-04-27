@@ -46,7 +46,7 @@ export class CharacterController extends Component {
                 return;
             }
             this._velocity.set(0, 0);
-            AudioManager.instance.playPfx();
+            AudioManager.instance.playSfx();
             this._animation.shoot();
             emitter.emit(GameEvents.SHOOT, { bulletType: 'BulletFire', direction: this._direction > 0 ? 1 : -1, position: this.positionShoot.worldPosition });
         }

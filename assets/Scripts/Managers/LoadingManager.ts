@@ -41,7 +41,7 @@ export class LoadingManager extends Component {
         })
     }
 
-    _randomBackground() {
+    private _randomBackground() {
         const total = this.backgrounds.length;
         const random = Math.floor(Math.random() * (total));
         this.backgrounds.forEach(background => {

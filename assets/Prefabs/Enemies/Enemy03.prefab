@@ -923,7 +923,6 @@
     "hp": 100,
     "attackRange": 100,
     "attackCooldown": 5,
-    "isBoss": true,
     "score": 10,
     "_id": ""
   },

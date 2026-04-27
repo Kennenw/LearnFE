@@ -8,37 +8,37 @@ const { ccclass } = _decorator;
 export class ButtonController extends Component {
 
     onClickSetting() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.SETTING_PLAY);
     }
 
     onClickCloseSetting() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.SETTING_CLOSE);
     }
 
     onClickPlay() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.BUTTON_PLAY);
     }
 
     onClickPause() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.PAUSE_PLAY);
     }
 
     onClickClosePause() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.PAUSE_CLOSE);
     }
 
     onClickQuit() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.ROOM_QUIT);
     }
 
     onClickReset() {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         emitter.emit(GameEvents.ROOM_RESET);
     }
 }

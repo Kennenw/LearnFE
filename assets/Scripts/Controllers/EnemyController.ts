@@ -102,8 +102,10 @@ export class EnemyController extends Component {
         tween(this.node)
             .sequence(
                 tween(this.node).to(0.18, { position: startLocalPos.clone().add(v3(lungeDistance * lungeDirection, 0, 0)) }, { easing: 'quadOut' }),
-                emitter.emit(GameEvents.PLAYER_TAKE_DAMAGE, {
-                    damage: this.damageAttack
+                tween(this.node).call(() => {
+                    emitter.emit(GameEvents.PLAYER_TAKE_DAMAGE, {
+                        damage: this.damageAttack
+                    });
                 }),
                 tween(this.node).to(0.22, { position: startLocalPos }, { easing: 'quadIn' })
             )
@@ -122,6 +124,12 @@ export class EnemyController extends Component {
     }
 
     private _death() {
+        if (this._isDeath) {
+            return;
+        }
+        if (!this.node || !this.node.isValid) {
+            return;
+        }
         emitter.emit(GameEvents.CALCULATE_SCORE, { score: this.score })
         this._isDeath = true;
         const colliders = this.node.getComponents(Collider2D);
@@ -133,7 +141,9 @@ export class EnemyController extends Component {
         tween(sprite.color)
             .by(1, { a: 0 })
             .call(() => {
-                this.node.destroy();
+                if (this.node && this.node.isValid) {
+                    this.node.destroy();
+                }
             })
             .start();
     }
@@ -154,7 +164,9 @@ export class EnemyController extends Component {
         tween(node)
             .by(1, { position: v3(0, 50, 0) })
             .call(() => {
-                node.destroy();
+                if (node && node.isValid) {
+                    node.destroy();
+                }
             })
             .start();
     }

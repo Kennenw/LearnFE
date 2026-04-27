@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Label, Sprite } from 'cc';
+import { _decorator, Button, Component, Sprite } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
 import { GameEvents } from '../Core/Constants/GameEvents';
 import { SceneManager } from './SceneManager';

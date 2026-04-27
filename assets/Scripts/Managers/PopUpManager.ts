@@ -28,7 +28,7 @@ export class PopUpManager extends Component {
     musicToggle: Toggle
 
     @property(Toggle)
-    pfx: Toggle
+    sfx: Toggle
 
     @property(Label)
     waveLabel: Label
@@ -47,22 +47,22 @@ export class PopUpManager extends Component {
         PopUpManager._instance = this;
         director.addPersistRootNode(this.node);
         this.musicToggle.node.on(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
-        this.pfx.node.on(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
+        this.sfx.node.on(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
     }
 
     protected onDestroy(): void {
         this.musicToggle.node.off(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
-        this.pfx.node.off(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
+        this.sfx.node.off(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
     }
 
     onMusicChanged(toggle: Toggle) {
-        AudioManager.instance.playPfx();
+        AudioManager.instance.playSfx();
         AudioManager.instance.music.volume = toggle.isChecked ? 1 : 0;
     }
 
     onSfxChanged(toggle: Toggle) {
-        AudioManager.instance.playPfx();
-        AudioManager.instance.pfx.volume = toggle.isChecked ? 1 : 0;
+        AudioManager.instance.playSfx();
+        AudioManager.instance.sfx.volume = toggle.isChecked ? 1 : 0;
     }
 
     showPause(wave: string) {

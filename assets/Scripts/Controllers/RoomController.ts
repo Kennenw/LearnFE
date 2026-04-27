@@ -84,7 +84,7 @@ export class RoomController extends Component {
             return;
         }
 
-        if (this._isBoss) {
+        if (this._isBoss && this._totalEnemy <= 0 && !this._isWave) {
             this._win();
             return;
         }
@@ -97,7 +97,7 @@ export class RoomController extends Component {
             }
 
             if (this.currentWave === WAVE_ROOM.WAVE_02) {
-                this.bossWave(15, WAVE_ROOM.WAVE_BOSS);
+                this._bossWave(15, WAVE_ROOM.WAVE_BOSS);
                 return;
             }
 
@@ -118,6 +118,20 @@ export class RoomController extends Component {
         this._totalEnemy--;
         this._currentScore += data.score;
         this.score.string = `SCORE:  ${this._currentScore}`;
+    }
+
+    onCharacterHit(data: any) {
+        this._updateProgressBar(data.damage);
+        if (this.progressBar.progress <= 0) {
+            this._character.death();
+            this.scheduleOnce(() => {
+                this._lose();
+            }, 3)
+        }
+    }
+
+    onQuit() {
+        this.node.destroy();
     }
 
     private _createWave(totalEnemy: number, totalTime: number, wave: number, wavelabel: string) {
@@ -164,7 +178,7 @@ export class RoomController extends Component {
         this.schedule(spawnFunction, 2, totalEnemy - 1, 3);
     }
 
-    bossWave(totalEnemy: number, wavelabel: string) {
+    private _bossWave(totalEnemy: number, wavelabel: string) {
         this._waveTime = 999999;
         let count = 0;
         this.currentWave = wavelabel;
@@ -209,21 +223,6 @@ export class RoomController extends Component {
         this.schedule(spawnFunction, 1, totalEnemy - 1, 1);
     }
 
-    onCharacterHit(data: any) {
-        this._updateProgressBar(data.damage);
-        if (this.progressBar.progress <= 0) {
-            this._character.death();
-            this.scheduleOnce(() => {
-                this._lose();
-            }, 1)
-        }
-    }
-
-    onQuit() {
-        this.node.destroy();
-        this.node = null;
-    }
-
     private _updateProgressBar(damge: number) {
         this._currentHp = Math.max(this._currentHp - damge, 0);
         this.progressBar.progress = this._currentHp / this._character.hp;
@@ -251,7 +250,6 @@ export class RoomController extends Component {
             emitter.off(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
             emitter.off(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
             this._enableButton(false);
-            this.unscheduleAllCallbacks();
             this._popUp.showWin(this._currentScore.toString());
         }
     }
