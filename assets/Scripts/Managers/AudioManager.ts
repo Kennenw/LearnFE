@@ -26,15 +26,26 @@ export class AudioManager extends Component {
     }
 
     onSlideMusic() {
-        this.music.volume = this.musicSlider.progress;
-        this.sfx.volume = this.musicSlider.progress;
+        const value = this.musicSlider.progress;
+
+        this.music.volume = value;
+        this.sfx.volume = value;
+        if (value <= 0) {
+            this.music.pause();
+        }
     }
 
     playMusic() {
+        if (this.music.volume <= 0) {
+            return;
+        }
         this.music.play();
     }
 
     playSfx() {
+        if (this.sfx.volume <= 0) {
+            return;
+        }
         this.sfx.play();
     }
 

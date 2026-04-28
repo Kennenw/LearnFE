@@ -56,13 +56,15 @@ export class PopUpManager extends Component {
     }
 
     onMusicChanged(toggle: Toggle) {
-        AudioManager.instance.playSfx();
         AudioManager.instance.music.volume = toggle.isChecked ? 1 : 0;
+        AudioManager.instance.playSfx();
     }
 
     onSfxChanged(toggle: Toggle) {
-        AudioManager.instance.playSfx();
         AudioManager.instance.sfx.volume = toggle.isChecked ? 1 : 0;
+        if (toggle.isChecked) {
+            AudioManager.instance.playSfx();
+        }
     }
 
     showPause(wave: string) {
