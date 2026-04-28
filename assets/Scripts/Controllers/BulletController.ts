@@ -1,6 +1,6 @@
 import { _decorator, Collider2D, Component, Contact2DType, RigidBody2D, Vec2, view } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 const { ccclass, property } = _decorator;
 
 @ccclass('BulletController')
@@ -15,6 +15,7 @@ export class BulletController extends Component {
     direction: number;
     private _collider: Collider2D;
     private _rigidBody2D: RigidBody2D;
+    type: string;
 
     protected onLoad(): void {
         this._collider = this.node.getComponent(Collider2D);
@@ -44,9 +45,10 @@ export class BulletController extends Component {
     }
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
-        emitter.emit(GameEvents.ENEMY_TAKE_DAMAGE, {
+        emitter.emit(GAME_EVENTS.ENEMY_TAKE_DAMAGE, {
             damage: this.damage,
-            target: otherCollider.node
+            target: otherCollider.node,
+            bulletType: this.type
         })
         this.node.destroy();
     }

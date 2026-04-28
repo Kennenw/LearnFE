@@ -1,9 +1,10 @@
 import { Node, Vec3 } from "cc"
 import { CharacterController } from "../../Controllers/CharacterController"
 
-export const GameEvents = {
+export const GAME_EVENTS = {
     SPAWN_CHARACTER: 'SPAWN:CHARACTER',
     CHANGED_CHARACTER: 'CHANGED:CHARACTER',
+    CHOOSE_BULLET: 'CHOOSE:BULLET',
 
     ENEMY_TAKE_DAMAGE: 'ENEMY:TAKE:DAMAGE',
     CALCULATE_SCORE: 'CALCULATE:SCORE',
@@ -24,23 +25,25 @@ export const GameEvents = {
 }
 
 export type Events = {
-    [GameEvents.SPAWN_CHARACTER]: string,
-    [GameEvents.SPAWN_CHARACTER]: CharacterController,
-    [GameEvents.SHOOT]: { bulletType: string, direction: number, position: Vec3 },
+    [GAME_EVENTS.SPAWN_CHARACTER]: string,
+    [GAME_EVENTS.SPAWN_CHARACTER]: CharacterController,
+    [GAME_EVENTS.SHOOT]: { bulletType: string, direction: number, position: Vec3 },
 
-    [GameEvents.ENEMY_TAKE_DAMAGE]: { damage: number, target: Node },
-    [GameEvents.PLAYER_TAKE_DAMAGE]: { damage: number },
+    [GAME_EVENTS.ENEMY_TAKE_DAMAGE]: { damage: number, target: Node, bulletType: string },
+    [GAME_EVENTS.PLAYER_TAKE_DAMAGE]: { damage: number },
 
-    [GameEvents.BUTTON_PLAY]: void,
-    [GameEvents.CALCULATE_SCORE]: { score: number, isBoss: boolean },
+    [GAME_EVENTS.BUTTON_PLAY]: void,
 
-    [GameEvents.SETTING_PLAY]: void,
-    [GameEvents.PAUSE_PLAY]: void,
-    [GameEvents.SETTING_CLOSE]: void,
-    [GameEvents.PAUSE_CLOSE]: void,
+    [GAME_EVENTS.CHOOSE_BULLET]: { type: string },
+    [GAME_EVENTS.CALCULATE_SCORE]: { score: number, isBoss: boolean },
 
-    [GameEvents.ROOM_PLAY]: string,
-    [GameEvents.ROOM_QUIT]: void,
-    [GameEvents.ROOM_RESET]: void,
+    [GAME_EVENTS.SETTING_PLAY]: void,
+    [GAME_EVENTS.PAUSE_PLAY]: void,
+    [GAME_EVENTS.SETTING_CLOSE]: void,
+    [GAME_EVENTS.PAUSE_CLOSE]: void,
+
+    [GAME_EVENTS.ROOM_PLAY]: string,
+    [GAME_EVENTS.ROOM_QUIT]: void,
+    [GAME_EVENTS.ROOM_RESET]: void,
 }
 
