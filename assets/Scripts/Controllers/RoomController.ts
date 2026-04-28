@@ -1,8 +1,8 @@
-import { _decorator, Button, Component, Label, ProgressBar, Node } from 'cc';
+import { _decorator, Button, Component, Label, ProgressBar, Node, Color } from 'cc';
 import { CharacterManager } from '../Managers/CharacterManager';
 import { EnemyManager } from '../Managers/EnemyManager';
 import { CharacterController } from './CharacterController';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
 import { WAVE_ROOM } from '../Core/Constants/Common';
 import { PopUpManager } from '../Managers/PopUpManager';
@@ -31,6 +31,15 @@ export class RoomController extends Component {
     @property([Node])
     imagePopup: Node[] = [];
 
+    @property([Node])
+    buttonBulletTypes: Node[] = [];
+
+    @property(Node)
+    backgroundPanelEnemy: Node
+
+    @property(Node)
+    backgroundPanelBoss: Node
+
     private _charactorManager: CharacterManager;
     private _enemyManager: EnemyManager;
     private _character: CharacterController;
@@ -45,6 +54,7 @@ export class RoomController extends Component {
     private _isWave: boolean = false;
     currentWave: string = '';
     private _isBoss: boolean;
+    private _onButtonBulletType: (data: any) => void;
 
     init() {
         this._popUp = PopUpManager.instance;
@@ -58,12 +68,14 @@ export class RoomController extends Component {
         this._currentHp = this._character.hp;
 
         this._onCharacterHit = this.onCharacterHit.bind(this);
-        emitter.on(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
+        emitter.on(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
         this._onCalculatePoint = this.onCalculatePoint.bind(this);
-        emitter.on(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
+        emitter.on(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
         this.totalEnemy.string = `${this.totalEnemy}`;
         this.score.string = `SCORE:  ${this._currentScore}`;
         this.currentWave = WAVE_ROOM.WAVE_01;
+        this._onButtonBulletType = this.onButtonBulletType.bind(this);
+        emitter.on(GAME_EVENTS.CHOOSE_BULLET, this._onButtonBulletType);
     }
 
     protected start(): void {
@@ -109,8 +121,9 @@ export class RoomController extends Component {
     }
 
     protected onDestroy(): void {
-        emitter.off(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
-        emitter.off(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
+        emitter.off(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
+        emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
+        emitter.off(GAME_EVENTS.CHOOSE_BULLET, this._onButtonBulletType);
     }
 
     onCalculatePoint(data: any) {
@@ -134,6 +147,17 @@ export class RoomController extends Component {
         this.node.destroy();
     }
 
+    private onButtonBulletType(data: any) {
+        this.buttonBulletTypes.forEach((button) => {
+            if (button.name === data.type) {
+                console.log('first', data.type)
+                button.setScale(0.8, 0.8);
+            } else {
+                button.setScale(1, 1);
+            }
+        })
+    }
+
     private _createWave(totalEnemy: number, totalTime: number, wave: number, wavelabel: string) {
         this._waveTime = totalTime;
         this.currentWave = wavelabel;
@@ -144,6 +168,7 @@ export class RoomController extends Component {
         });
 
         this.scheduleOnce(() => {
+            this.backgroundPanelEnemy.active = true;
             this.imagePopup.forEach((image) => {
                 image.active = image.name === this._listEnemy[wave - 1];
                 if (image.active) {
@@ -159,7 +184,7 @@ export class RoomController extends Component {
                 image.active = false;
             });
 
-        }, 3);
+        }, 4);
 
         const spawnFunction = () => {
             this._enemyManager.spawn(
@@ -188,6 +213,8 @@ export class RoomController extends Component {
         });
 
         this.scheduleOnce(() => {
+            this.backgroundPanelEnemy.active = false;
+            this.backgroundPanelBoss.active = true;
             this.imagePopup.forEach((image) => {
                 image.active = image.name === this._listEnemy[2];
                 if (image.active) {
@@ -203,7 +230,7 @@ export class RoomController extends Component {
             });
             this._enemyManager.spawn(this._character.node.worldPosition, this._listEnemy[2]);
             this._totalEnemy++;
-        }, 3);
+        }, 4);
 
         const spawnFunction = () => {
             this._enemyManager.spawn(
@@ -238,8 +265,8 @@ export class RoomController extends Component {
     }
 
     private _lose() {
-        emitter.off(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
-        emitter.off(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
+        emitter.off(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
+        emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
 
         this._enableButton(false);
         this._popUp.showLose(this._currentScore.toString());
@@ -247,8 +274,8 @@ export class RoomController extends Component {
 
     private _win() {
         if (this._totalEnemy <= 0 && !this._isWave) {
-            emitter.off(GameEvents.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
-            emitter.off(GameEvents.CALCULATE_SCORE, this._onCalculatePoint);
+            emitter.off(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
+            emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
             this._enableButton(false);
             this._popUp.showWin(this._currentScore.toString());
         }

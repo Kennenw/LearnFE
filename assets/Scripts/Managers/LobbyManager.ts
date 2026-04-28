@@ -1,6 +1,6 @@
 import { _decorator, Button, Component, Sprite } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { SceneManager } from './SceneManager';
 import { PopUpManager } from './PopUpManager';
 
@@ -21,17 +21,17 @@ export class LobbyManager extends Component {
         this._scene = SceneManager.instance;
         this._popUp = PopUpManager.instance;
         this._onPlayGame = this.onPlayGame.bind(this);
-        emitter.on(GameEvents.BUTTON_PLAY, this._onPlayGame);
+        emitter.on(GAME_EVENTS.BUTTON_PLAY, this._onPlayGame);
         this._onPlaySetting = this.onPlaySetting.bind(this);
-        emitter.on(GameEvents.SETTING_PLAY, this._onPlaySetting);
+        emitter.on(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
         this._onCloseSetting = this.onCloseSetting.bind(this);
-        emitter.on(GameEvents.SETTING_CLOSE, this._onCloseSetting);
+        emitter.on(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
     }
 
     protected onDestroy(): void {
-        emitter.off(GameEvents.BUTTON_PLAY, this._onPlayGame);
-        emitter.off(GameEvents.SETTING_PLAY, this._onPlaySetting);
-        emitter.off(GameEvents.SETTING_CLOSE, this._onCloseSetting);
+        emitter.off(GAME_EVENTS.BUTTON_PLAY, this._onPlayGame);
+        emitter.off(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
+        emitter.off(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
     }
 
     onLobby() {

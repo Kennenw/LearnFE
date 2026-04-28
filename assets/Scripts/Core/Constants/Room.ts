@@ -1,3 +1,3 @@
-export const Room = {
-    ROOM_01: 'ROOM_01',
+export const ROOM = {
+    ROOM_01: 'Room-01',
 }

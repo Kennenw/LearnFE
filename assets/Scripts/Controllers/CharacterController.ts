@@ -1,8 +1,9 @@
 import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, director, Camera, view } from 'cc';
 import { AnimationStateMachine } from '../Core/StateMachines/AnimationStateMachine';
 import { emitter } from '../Core/Events/Emitter';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { AudioManager } from '../Managers/AudioManager';
+import { BULLET_TYPE } from '../Core/Constants/Bullet';
 const { ccclass, property } = _decorator;
 
 @ccclass('CharacterController')
@@ -22,8 +23,9 @@ export class CharacterController extends Component {
     private _velocity: Vec2 = new Vec2(0, 0);
     private _direction: number = 1;
     private _limitMove: any;
-
     private _rigidBody2D: RigidBody2D;
+
+    bulletType: string = BULLET_TYPE.BULLET_NORMAL;
 
     protected onLoad(): void {
         this._rigidBody2D = this.node.getComponent(RigidBody2D);
@@ -48,7 +50,11 @@ export class CharacterController extends Component {
             this._velocity.set(0, 0);
             AudioManager.instance.playSfx();
             this._animation.shoot();
-            emitter.emit(GameEvents.SHOOT, { bulletType: 'BulletFire', direction: this._direction > 0 ? 1 : -1, position: this.positionShoot.worldPosition });
+            emitter.emit(GAME_EVENTS.SHOOT, {
+                bulletType: this.bulletType,
+                direction: this._direction > 0 ? 1 : -1, 
+                position: this.positionShoot.worldPosition
+            });
         }
     }
 

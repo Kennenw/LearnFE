@@ -2,8 +2,9 @@ import { _decorator, Component, instantiate, Prefab, Node, BlockInputEvents, But
 import { RoomController } from '../Controllers/RoomController';
 import { PopUpManager } from './PopUpManager';
 import { emitter } from '../Core/Events/Emitter';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { SceneManager } from './SceneManager';
+import { ROOM } from '../Core/Constants/Room';
 const { ccclass, property } = _decorator;
 
 @ccclass('RoomManager')
@@ -30,30 +31,30 @@ export class RoomManager extends Component {
             this._prefabs.set(room.name, room);
         })
         this._onPlayPause = this.onPlayPause.bind(this);
-        emitter.on(GameEvents.PAUSE_PLAY, this._onPlayPause);
+        emitter.on(GAME_EVENTS.PAUSE_PLAY, this._onPlayPause);
         this._onClosePause = this.onClosePause.bind(this);
-        emitter.on(GameEvents.PAUSE_CLOSE, this._onClosePause);
+        emitter.on(GAME_EVENTS.PAUSE_CLOSE, this._onClosePause);
         this._onPlaySetting = this.onPlaySetting.bind(this);
-        emitter.on(GameEvents.SETTING_PLAY, this._onPlaySetting);
+        emitter.on(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
         this._onCloseSetting = this.onCloseSetting.bind(this);
-        emitter.on(GameEvents.SETTING_CLOSE, this._onCloseSetting);
+        emitter.on(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
         this._onQuitRoom = this.onQuit.bind(this);
-        emitter.on(GameEvents.ROOM_QUIT, this._onQuitRoom);
+        emitter.on(GAME_EVENTS.ROOM_QUIT, this._onQuitRoom);
         this._onResetRoom = this.onReset.bind(this);
-        emitter.on(GameEvents.ROOM_RESET, this._onResetRoom);
+        emitter.on(GAME_EVENTS.ROOM_RESET, this._onResetRoom);
     }
 
     protected onDestroy(): void {
-        emitter.off(GameEvents.PAUSE_PLAY, this._onPlayPause);
-        emitter.off(GameEvents.PAUSE_CLOSE, this._onClosePause);
-        emitter.off(GameEvents.SETTING_PLAY, this._onPlaySetting);
-        emitter.off(GameEvents.SETTING_CLOSE, this._onCloseSetting);
-        emitter.off(GameEvents.ROOM_QUIT, this._onQuitRoom);
-        emitter.off(GameEvents.ROOM_RESET, this._onResetRoom);
+        emitter.off(GAME_EVENTS.PAUSE_PLAY, this._onPlayPause);
+        emitter.off(GAME_EVENTS.PAUSE_CLOSE, this._onClosePause);
+        emitter.off(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
+        emitter.off(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
+        emitter.off(GAME_EVENTS.ROOM_QUIT, this._onQuitRoom);
+        emitter.off(GAME_EVENTS.ROOM_RESET, this._onResetRoom);
     }
 
     protected start(): void {
-        this.loadRoom('Room-01');
+        this.loadRoom(ROOM.ROOM_01);
     }
 
     onPlayPause() {

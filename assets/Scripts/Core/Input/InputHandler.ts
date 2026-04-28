@@ -7,7 +7,7 @@ import { MoveDownCommand } from "./Commands/MoveDownCommand";
 import { ShootCommand } from "./Commands/ShootCommand";
 import { CharacterController } from "../../Controllers/CharacterController";
 import { emitter } from "../Events/Emitter";
-import { GameEvents } from "../Constants/GameEvents";
+import { GAME_EVENTS } from "../Constants/GameEvents";
 const { ccclass } = _decorator;
 
 @ccclass('InputHandler')
@@ -21,7 +21,7 @@ export class InputHandler extends Component {
     }
 
     protected onLoad(): void {
-        emitter.on(GameEvents.CHANGED_CHARACTER, this._onCharacterChanged.bind(this));
+        emitter.on(GAME_EVENTS.CHANGED_CHARACTER, this._onCharacterChanged.bind(this));
         input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
@@ -57,7 +57,7 @@ export class InputHandler extends Component {
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
         input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this);
-        emitter.off(GameEvents.CHANGED_CHARACTER, this._onCharacterChanged.bind(this));
+        emitter.off(GAME_EVENTS.CHANGED_CHARACTER, this._onCharacterChanged.bind(this));
     }
 
     private _onCharacterChanged = (c: CharacterController) => {

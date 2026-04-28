@@ -1,7 +1,8 @@
 import { _decorator, Component, director, instantiate, Prefab, Node, Vec3, Camera, view, math } from 'cc';
 import { EnemyController } from '../Controllers/EnemyController';
 import { emitter } from '../Core/Events/Emitter';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
+import { BULLET_TYPE } from '../Core/Constants/Bullet';
 const { ccclass, property } = _decorator;
 
 
@@ -22,11 +23,11 @@ export class EnemyManager extends Component {
             this._prefabs.set(prefab.name, prefab);
         });
         this._onHit = this.onHit.bind(this);
-        emitter.on(GameEvents.ENEMY_TAKE_DAMAGE, this._onHit);
+        emitter.on(GAME_EVENTS.ENEMY_TAKE_DAMAGE, this._onHit);
     }
 
     protected onDestroy(): void {
-        emitter.off(GameEvents.ENEMY_TAKE_DAMAGE, this._onHit);
+        emitter.off(GAME_EVENTS.ENEMY_TAKE_DAMAGE, this._onHit);
     }
 
     protected update(dt: number): void {
@@ -40,6 +41,9 @@ export class EnemyManager extends Component {
     onHit(data: any) {
         const target = this._enemies.get(data.target.uuid);
         target.calculateDamage(data.damage);
+        if (data.bulletType === BULLET_TYPE.BULLET_ICE) {
+            target.slow();
+        }
     }
 
     move(dt: number, target: Node) {

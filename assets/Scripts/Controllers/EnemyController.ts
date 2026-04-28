@@ -1,5 +1,5 @@
-import { _decorator, Collider2D, Component, instantiate, Label, Node, Prefab, ProgressBar, Sprite, tween, v3, Vec3 } from 'cc';
-import { GameEvents } from '../Core/Constants/GameEvents';
+import { _decorator, Collider2D, Color, Component, instantiate, Label, Node, Prefab, ProgressBar, sp, Sprite, tween, v3, Vec3 } from 'cc';
+import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
 const { ccclass, property } = _decorator;
 
@@ -7,6 +7,9 @@ const { ccclass, property } = _decorator;
 export class EnemyController extends Component {
     @property(ProgressBar)
     progressBar: ProgressBar
+
+    @property(Sprite)
+    sprite: Sprite
 
     @property(Prefab)
     damageText: Prefab
@@ -33,6 +36,25 @@ export class EnemyController extends Component {
     private _attackCooldown: number = this.attackCooldown;
     private _isDeath: boolean = false;
     private _maxHp: number = this.hp;
+    private _defaultColor: Color;
+    private _defaultSpeed: number;
+    private _defaultAttackCoolDown: number;
+    private _slowColor: Color = new Color(46, 52, 179, 255);
+    private _setSlowCoolDown: number = 2;
+    private _slowCoolDown: number = this._setSlowCoolDown;
+
+    protected onLoad(): void {
+        this._defaultColor = this.sprite.color.clone();
+        this._defaultSpeed = this.speed;
+        this._defaultAttackCoolDown = this.attackCooldown;
+    }
+
+    protected update(dt: number): void {
+        this._slowCoolDown -= dt;
+        if (this._slowCoolDown <= 0) {
+            this.normal();
+        }
+    }
 
     calculateDamage(damge: number) {
         this._updateProgressBar(damge);
@@ -40,7 +62,7 @@ export class EnemyController extends Component {
     }
 
     move(dt: number, target: Node) {
-        if (!this.node) {
+        if (!this.node || this._isDeath) {
             return;
         }
         const playerPosition = target.worldPosition.clone();
@@ -86,6 +108,19 @@ export class EnemyController extends Component {
         }
     }
 
+    slow() {
+        this.speed /= 2;
+        this.attackCooldown *= 2;
+        this.sprite.color = this._slowColor;
+        this._slowCoolDown = this._setSlowCoolDown;
+    }
+
+    normal() {
+        this.speed = this._defaultSpeed;
+        this.attackCooldown = this._defaultAttackCoolDown;
+        this.sprite.color = this._defaultColor;
+    }
+
     private _attack(targetWorldPos: Vec3) {
         if (this._isDeath) {
             return;
@@ -95,7 +130,7 @@ export class EnemyController extends Component {
 
         const distanceToTarget = targetWorldPos.clone().subtract(selfWorldPos).length();
 
-        const lungeDirection = this.node.scale.x >= 0 ? 1 : -1;
+        const lungeDirection = this.node.scale.x >= 0 ? -1 : 1;
 
         let lungeDistance = Math.min(this.attackRange, distanceToTarget - this.attackRange * 0.2);
 
@@ -103,7 +138,7 @@ export class EnemyController extends Component {
             .sequence(
                 tween(this.node).to(0.18, { position: startLocalPos.clone().add(v3(lungeDistance * lungeDirection, 0, 0)) }, { easing: 'quadOut' }),
                 tween(this.node).call(() => {
-                    emitter.emit(GameEvents.PLAYER_TAKE_DAMAGE, {
+                    emitter.emit(GAME_EVENTS.PLAYER_TAKE_DAMAGE, {
                         damage: this.damageAttack
                     });
                 }),
@@ -124,19 +159,16 @@ export class EnemyController extends Component {
     }
 
     private _death() {
-        if (this._isDeath) {
-            return;
-        }
+        this._isDeath = true;
         if (!this.node || !this.node.isValid) {
             return;
         }
-        emitter.emit(GameEvents.CALCULATE_SCORE, { score: this.score })
+        emitter.emit(GAME_EVENTS.CALCULATE_SCORE, { score: this.score })
         this._isDeath = true;
         const colliders = this.node.getComponents(Collider2D);
         colliders.forEach(collider => {
             collider.destroy();
         });
-        this.speed = 0;
         const sprite = this.node.getComponent(Sprite);
         tween(sprite.color)
             .by(1, { a: 0 })
