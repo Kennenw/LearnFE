@@ -11,7 +11,7 @@
     "6c48a": {
       "importer": "texture",
       "uuid": "edc93294-d999-4644-8100-e7edade7851f@6c48a",
-      "displayName": "Button_Circle_01_White_Gradient.Png",
+      "displayName": "Button_Circle_01_White_Gradient",
       "id": "6c48a",
       "name": "texture",
       "userData": {
@@ -35,7 +35,7 @@
     "f9941": {
       "importer": "sprite-frame",
       "uuid": "edc93294-d999-4644-8100-e7edade7851f@f9941",
-      "displayName": "Button_Circle_01_White_Gradient.Png",
+      "displayName": "Button_Circle_01_White_Gradient",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {
