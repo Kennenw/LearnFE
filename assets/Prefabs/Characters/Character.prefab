@@ -246,7 +246,7 @@
     "__prefab": {
       "__id__": 11
     },
-    "hp": 100,
+    "hp": 200,
     "speed": 10,
     "positionShoot": {
       "__id__": 2

@@ -921,12 +921,12 @@
       "__uuid__": "fa0a5eeb-c5b9-428f-9303-a40d906b964b",
       "__expectedType__": "cc.Prefab"
     },
-    "damageAttack": 100,
-    "speed": 50,
-    "hp": 100,
-    "attackRange": 100,
+    "damageAttack": 50,
+    "speed": 200,
+    "hp": 800,
+    "attackRange": 200,
     "attackCooldown": 5,
-    "score": 10,
+    "score": 1000,
     "_id": ""
   },
   {

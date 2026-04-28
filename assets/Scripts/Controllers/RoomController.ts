@@ -189,7 +189,7 @@ export class RoomController extends Component {
         const spawnFunction = () => {
             this._enemyManager.spawn(
                 this._character.node.worldPosition,
-                this._listEnemy[wave - 1]
+                this._randomEnemy(wave)
             );
 
             this._totalEnemy++;
