@@ -1015,7 +1015,7 @@
     },
     "_premultipliedAlpha": true,
     "defaultSkin": "default",
-    "defaultAnimation": "jump",
+    "defaultAnimation": "run",
     "_enableBatch": false,
     "_sockets": [],
     "_debugMesh": false,
