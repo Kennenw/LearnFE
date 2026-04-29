@@ -122,9 +122,6 @@ export class EnemyController extends Component {
     }
 
     private _attack(targetWorldPos: Vec3) {
-        if (this._isDeath) {
-            return;
-        }
         const startLocalPos = this.node.position.clone();
         const selfWorldPos = this.node.worldPosition.clone();
 
@@ -164,7 +161,6 @@ export class EnemyController extends Component {
             return;
         }
         emitter.emit(GAME_EVENTS.CALCULATE_SCORE, { score: this.score })
-        this._isDeath = true;
         const colliders = this.node.getComponents(Collider2D);
         colliders.forEach(collider => {
             collider.destroy();
@@ -173,9 +169,10 @@ export class EnemyController extends Component {
         tween(sprite.color)
             .by(1, { a: 0 })
             .call(() => {
-                if (this.node && this.node.isValid) {
-                    this.node.destroy();
-                }
+                emitter.emit(GAME_EVENTS.DROPPED_ITEM, {
+                    position: this.node.worldPosition
+                });
+                this.node.destroy();
             })
             .start();
     }

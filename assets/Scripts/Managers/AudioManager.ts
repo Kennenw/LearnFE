@@ -9,9 +9,6 @@ export class AudioManager extends Component {
     @property(AudioSource)
     music: AudioSource
 
-    @property(Slider)
-    musicSlider: Slider
-
     private static _instance: AudioManager;
 
     static get instance() {
@@ -22,16 +19,6 @@ export class AudioManager extends Component {
         if (!AudioManager._instance) {
             AudioManager._instance = this;
             director.addPersistRootNode(this.node);
-        }
-    }
-
-    onSlideMusic() {
-        const value = this.musicSlider.progress;
-
-        this.music.volume = value;
-        this.sfx.volume = value;
-        if (value <= 0) {
-            this.music.pause();
         }
     }
 

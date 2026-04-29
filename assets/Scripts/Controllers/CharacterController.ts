@@ -1,4 +1,4 @@
-import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, director, Camera, view } from 'cc';
+import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, director, Camera, view, Collider2D, Contact2DType } from 'cc';
 import { AnimationStateMachine } from '../Core/StateMachines/AnimationStateMachine';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
@@ -24,12 +24,15 @@ export class CharacterController extends Component {
     private _direction: number = 1;
     private _limitMove: any;
     private _rigidBody2D: RigidBody2D;
+    private _collider: Collider2D;
 
     bulletType: string = BULLET_TYPE.BULLET_NORMAL;
 
     protected onLoad(): void {
         this._rigidBody2D = this.node.getComponent(RigidBody2D);
+        this._collider = this.node.getComponent(Collider2D);
         this._limitMove = this._limitPosition();
+        this._collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
 
     protected start(): void {
@@ -42,6 +45,19 @@ export class CharacterController extends Component {
         this._clampPosition();
     }
 
+    protected onDestroy(): void {
+        this._collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
+
+    onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+        if (otherCollider.group === 16) {
+            emitter.emit(GAME_EVENTS.PICK_ITEM, {
+                id: otherCollider.node.uuid,
+                item: otherCollider.node
+            });
+        }
+    }
+
     shoot(keyDown: boolean = true) {
         if (keyDown) {
             if (this._animation.isLocked()) {
@@ -52,7 +68,7 @@ export class CharacterController extends Component {
             this._animation.shoot();
             emitter.emit(GAME_EVENTS.SHOOT, {
                 bulletType: this.bulletType,
-                direction: this._direction > 0 ? 1 : -1, 
+                direction: this._direction > 0 ? 1 : -1,
                 position: this.positionShoot.worldPosition
             });
         }
@@ -160,4 +176,3 @@ export class CharacterController extends Component {
         }
     }
 }
-

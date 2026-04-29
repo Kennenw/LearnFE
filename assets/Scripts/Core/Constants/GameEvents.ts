@@ -22,6 +22,9 @@ export const GAME_EVENTS = {
     ROOM_PLAY: 'ROOM:PLAY',
     ROOM_QUIT: 'ROOM:QUIT',
     ROOM_RESET: 'ROOM:RESET',
+
+    DROPPED_ITEM: 'DROPPER:ITEM',
+    PICK_ITEM: 'PICK:ITEM'
 }
 
 export type Events = {
@@ -45,5 +48,8 @@ export type Events = {
     [GAME_EVENTS.ROOM_PLAY]: string,
     [GAME_EVENTS.ROOM_QUIT]: void,
     [GAME_EVENTS.ROOM_RESET]: void,
+
+    [GAME_EVENTS.DROPPED_ITEM]: { position: Vec3 },
+    [GAME_EVENTS.PICK_ITEM]: { id: string, item: Node },
 }
 

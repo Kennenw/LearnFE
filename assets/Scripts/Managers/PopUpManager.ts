@@ -1,4 +1,4 @@
-import { _decorator, BlockInputEvents, Component, director, Label, Node, Toggle } from 'cc';
+import { _decorator, BlockInputEvents, Component, director, Label, Node, Toggle, tween } from 'cc';
 import { AudioManager } from './AudioManager';
 
 const { ccclass, property } = _decorator;
@@ -18,11 +18,14 @@ export class PopUpManager extends Component {
     @property(Node)
     winPopup: Node;
 
-    @property(Label)
-    scoreWin: Label
+    @property([Label])
+    scoreWins: Label[] = [];
+
+    @property([Label])
+    scoreLoses: Label[] = [];
 
     @property(Label)
-    scoreLose: Label
+    scoreBonus: Label;
 
     @property(Toggle)
     musicToggle: Toggle
@@ -34,6 +37,7 @@ export class PopUpManager extends Component {
     waveLabel: Label
 
     private static _instance: PopUpManager;
+    private _bonusScore: number = 0;
 
     static get instance() {
         return this._instance;
@@ -100,11 +104,37 @@ export class PopUpManager extends Component {
         director.resume();
     }
 
-    showWin(score: string) {
+    showWin(score: number, bonusScore: number) {
+        this._bonusScore = bonusScore;
         this.winPopup.active = true;
-        this.scoreWin.string = score;
+        this.scoreWins.forEach(scoreWin => {
+            scoreWin.string = score.toString();
+        })
+
         this._addBlockEvents(this.winPopup);
-        director.pause();
+
+        this.scheduleOnce(() => {
+            this.scoreBonus.node.active = true;
+            this.scoreBonus.string = `BONUS + ${this._bonusScore}`;
+        }, 0.5);
+
+        this.scheduleOnce(() => {
+
+            this.schedule(() => {
+                if (this._bonusScore <= 0) {
+                    this.scoreBonus.node.active = false;
+                    this.unscheduleAllCallbacks();
+                    return;
+                }
+
+                this._bonusScore--;
+                this.scoreBonus.string = `BONUS + ${this._bonusScore}`;
+                score++;
+                this.scoreWins.forEach(scoreWin => {
+                    scoreWin.string = score.toString();
+                });
+            }, 0.00005)
+        }, 0.5);
     }
 
     hideWin() {
@@ -115,7 +145,9 @@ export class PopUpManager extends Component {
 
     showLose(score: string) {
         this.losePopup.active = true;
-        this.scoreLose.string = score;
+        this.scoreLoses.forEach(scoreLose => {
+            scoreLose.string = score;
+        })
         this._addBlockEvents(this.losePopup);
         director.pause();
     }
