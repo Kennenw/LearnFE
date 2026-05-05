@@ -1,4 +1,4 @@
-import { CharacterController } from "../../../Controllers/CharacterController";
+import { CharacterController } from  "../../CharacterController";
 import { ICommand } from "../ICommand";
 
 export class MoveRightCommand implements ICommand {

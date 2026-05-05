@@ -1,9 +1,9 @@
 import { _decorator, Component, instantiate, Prefab, Node, BlockInputEvents, Button } from 'cc';
-import { RoomController } from '../Controllers/RoomController';
-import { PopUpManager } from './PopUpManager';
+import { RoomController } from '../Rooms/RoomController';
+import { PopUpManager } from '../Managers/PopUpManager';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
-import { SceneManager } from './SceneManager';
+import { SceneManager } from '../Managers/SceneManager';
 import { ROOM } from '../Core/Constants/Room';
 const { ccclass, property } = _decorator;
 

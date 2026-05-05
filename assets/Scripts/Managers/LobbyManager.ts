@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Sprite } from 'cc';
+import { _decorator, Button, Component } from 'cc';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { SceneManager } from './SceneManager';
@@ -8,8 +8,6 @@ const { ccclass, property } = _decorator;
 
 @ccclass('LobbyManager')
 export class LobbyManager extends Component {
-    @property(Sprite)
-    sprite: Sprite;
 
     private _onPlayGame: () => void;
     private _onPlaySetting: () => void;

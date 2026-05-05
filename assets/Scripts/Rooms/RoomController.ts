@@ -1,7 +1,7 @@
 import { _decorator, Button, Component, Label, ProgressBar, Node } from 'cc';
-import { CharacterManager } from '../Managers/CharacterManager';
-import { EnemyManager } from '../Managers/EnemyManager';
-import { CharacterController } from './CharacterController';
+import { CharacterManager } from '../Characters/CharacterManager';
+import { EnemyManager } from '../Enemies/EnemyManager';
+import { CharacterController } from '../Characters/CharacterController';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
 import { WAVE_ROOM } from '../Core/Constants/Common';

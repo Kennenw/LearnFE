@@ -1,5 +1,5 @@
 import { _decorator, Component, director, instantiate, Prefab, Node, Vec3, Camera, view, math } from 'cc';
-import { EnemyController } from '../Controllers/EnemyController';
+import { EnemyController } from './EnemyController';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 const { ccclass, property } = _decorator;

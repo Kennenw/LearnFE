@@ -5,9 +5,9 @@ import { MoveRightCommand } from "./Commands/MoveRightCommand";
 import { MoveUpCommand } from "./Commands/MoveUpCommand";
 import { MoveDownCommand } from "./Commands/MoveDownCommand";
 import { ShootCommand } from "./Commands/ShootCommand";
-import { CharacterController } from "../../Controllers/CharacterController";
-import { emitter } from "../Events/Emitter";
-import { GAME_EVENTS } from "../Constants/GameEvents";
+import { CharacterController } from "../CharacterController";
+import { emitter } from "../../Core/Events/Emitter";
+import { GAME_EVENTS } from "../../Core/Constants/GameEvents";
 const { ccclass } = _decorator;
 
 @ccclass('InputHandler')

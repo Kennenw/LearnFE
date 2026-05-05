@@ -1,5 +1,5 @@
 import { _decorator, Component, instantiate, Prefab } from 'cc';
-import { CharacterController } from '../Controllers/CharacterController';
+import { CharacterController } from './CharacterController';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { ITEMS } from '../Core/Constants/Item';

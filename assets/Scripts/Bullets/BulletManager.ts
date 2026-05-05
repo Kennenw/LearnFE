@@ -1,5 +1,5 @@
 import { _decorator, Component, instantiate, Prefab, Vec3 } from 'cc';
-import { BulletController } from '../Controllers/BulletController';
+import { BulletController } from './BulletController';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 const { ccclass, property } = _decorator;

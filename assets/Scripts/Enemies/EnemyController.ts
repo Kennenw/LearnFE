@@ -1,4 +1,4 @@
-import { _decorator, Camera, Collider2D, Color, Component, instantiate, Label, Node, Prefab, ProgressBar, Sprite, tween, v3, Vec3 } from 'cc';
+import { _decorator, Collider2D, Color, Component, instantiate, Label, Node, Prefab, ProgressBar, Sprite, tween, v3, Vec3 } from 'cc';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
 import { BULLET_TYPE } from '../Core/Constants/Bullet';
