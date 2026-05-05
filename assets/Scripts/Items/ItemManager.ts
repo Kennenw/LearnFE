@@ -26,7 +26,7 @@ export class ItemManager extends Component {
 
     private randomSpawn(data: any) {
         const percent = Math.floor(Math.random() * 100);
-        if (percent <= 100) {
+        if (percent <= 10) {
             this._randomItems(data.position);
         }
         return;
