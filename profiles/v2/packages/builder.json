@@ -11,7 +11,7 @@
         "progress": 1,
         "state": "success",
         "stage": "run",
-        "message": "4-27-2026 14:08:44 run package D:\\LEARN FRONTEND\\notions-learn-2\\Cocos\\LearnFE\\build\\web-desktop success!",
+        "message": "5-5-2026 12:17:57 run package /Users/user/Desktop/Cocos/cocos3/build/web-desktop success!",
         "options": {
           "name": "cocos3",
           "platform": "web-desktop",
@@ -57,7 +57,7 @@
           "packages": {},
           "__version__": "1.3.5"
         },
-        "time": "4-27-2026 14:07",
+        "time": "5-5-2026 12:17",
         "dirty": false
       }
     }
