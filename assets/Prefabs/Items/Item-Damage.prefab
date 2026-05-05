@@ -215,6 +215,8 @@
     "__prefab": {
       "__id__": 11
     },
+    "nameItem": "Item-Damage",
+    "value": 10,
     "_id": ""
   },
   {

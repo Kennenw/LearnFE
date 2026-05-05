@@ -28,12 +28,6 @@ export class LobbyManager extends Component {
         emitter.on(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
     }
 
-    protected onDestroy(): void {
-        emitter.off(GAME_EVENTS.BUTTON_PLAY, this._onPlayGame);
-        emitter.off(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
-        emitter.off(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
-    }
-
     onLobby() {
         this.node.active = true;
     }
@@ -60,6 +54,12 @@ export class LobbyManager extends Component {
                 button.onDisable();
             }
         }))
+    }
+
+    protected onDestroy(): void {
+        emitter.off(GAME_EVENTS.BUTTON_PLAY, this._onPlayGame);
+        emitter.off(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
+        emitter.off(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
     }
 }
 

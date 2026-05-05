@@ -2,7 +2,6 @@ import { _decorator, Component, director, instantiate, Prefab, Node, Vec3, Camer
 import { EnemyController } from '../Controllers/EnemyController';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
-import { BULLET_TYPE } from '../Core/Constants/Bullet';
 const { ccclass, property } = _decorator;
 
 
@@ -15,8 +14,6 @@ export class EnemyManager extends Component {
     private _prefabs: Map<string, Prefab> = new Map();
     private _enemies: Map<string, EnemyController> = new Map();
     private _onHit: (damage: number, target: Node) => void;
-    _target: Node = null;
-
 
     protected onLoad(): void {
         this.enemies.forEach(prefab => {
@@ -26,33 +23,12 @@ export class EnemyManager extends Component {
         emitter.on(GAME_EVENTS.ENEMY_TAKE_DAMAGE, this._onHit);
     }
 
-    protected onDestroy(): void {
-        emitter.off(GAME_EVENTS.ENEMY_TAKE_DAMAGE, this._onHit);
-    }
-
-    protected update(dt: number): void {
-
-        if (!this._target) {
-            return;
-        }
-        this.move(dt, this._target);
-    }
-
     onHit(data: any) {
         const target = this._enemies.get(data.target.uuid);
-        target.calculateDamage(data.damage);
-        if (data.bulletType === BULLET_TYPE.BULLET_ICE) {
-            target.slow();
-        }
+        target.calculateDamage(data.damage, data.bulletType);
     }
 
-    move(dt: number, target: Node) {
-        this._enemies.forEach(enemy => {
-            enemy.move(dt, target);
-        });
-    }
-
-    spawn(playerWorldPosition: Vec3, prefabName: string = 'Enemy01'): Node {
+    spawn(playerWorldPosition: Vec3, prefabName: string = 'Enemy01', target: Node): Node {
         const spawnPosition = this._randomPosition(playerWorldPosition);
         if (!spawnPosition) {
             return;
@@ -61,6 +37,7 @@ export class EnemyManager extends Component {
         const node = instantiate(prefab);
         node.parent = this.node;
         node.setWorldPosition(spawnPosition);
+        node.getComponent(EnemyController).setTarget(target);
         this._enemies.set(node.uuid, node.getComponent(EnemyController));
         return node;
     }
@@ -93,6 +70,10 @@ export class EnemyManager extends Component {
             minY: cameraPosition.y - halfHeight,
             maxY: cameraPosition.y + halfHeight - 500
         }
+    }
+
+    protected onDestroy(): void {
+        emitter.off(GAME_EVENTS.ENEMY_TAKE_DAMAGE, this._onHit);
     }
 }
 

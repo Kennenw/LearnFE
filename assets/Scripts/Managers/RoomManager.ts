@@ -44,15 +44,6 @@ export class RoomManager extends Component {
         emitter.on(GAME_EVENTS.ROOM_RESET, this._onResetRoom);
     }
 
-    protected onDestroy(): void {
-        emitter.off(GAME_EVENTS.PAUSE_PLAY, this._onPlayPause);
-        emitter.off(GAME_EVENTS.PAUSE_CLOSE, this._onClosePause);
-        emitter.off(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
-        emitter.off(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
-        emitter.off(GAME_EVENTS.ROOM_QUIT, this._onQuitRoom);
-        emitter.off(GAME_EVENTS.ROOM_RESET, this._onResetRoom);
-    }
-
     protected start(): void {
         this.loadRoom(ROOM.ROOM_01);
     }
@@ -112,6 +103,15 @@ export class RoomManager extends Component {
                 button.onDisable();
             }
         }))
+    }
+
+    protected onDestroy(): void {
+        emitter.off(GAME_EVENTS.PAUSE_PLAY, this._onPlayPause);
+        emitter.off(GAME_EVENTS.PAUSE_CLOSE, this._onClosePause);
+        emitter.off(GAME_EVENTS.SETTING_PLAY, this._onPlaySetting);
+        emitter.off(GAME_EVENTS.SETTING_CLOSE, this._onCloseSetting);
+        emitter.off(GAME_EVENTS.ROOM_QUIT, this._onQuitRoom);
+        emitter.off(GAME_EVENTS.ROOM_RESET, this._onResetRoom);
     }
 }
 

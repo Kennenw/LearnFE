@@ -1,4 +1,4 @@
-import { _decorator, BlockInputEvents, Component, director, Label, Node, Toggle, tween } from 'cc';
+import { _decorator, BlockInputEvents, Component, director, Label, Node, Toggle } from 'cc';
 import { AudioManager } from './AudioManager';
 
 const { ccclass, property } = _decorator;
@@ -52,11 +52,6 @@ export class PopUpManager extends Component {
         director.addPersistRootNode(this.node);
         this.musicToggle.node.on(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
         this.sfx.node.on(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
-    }
-
-    protected onDestroy(): void {
-        this.musicToggle.node.off(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
-        this.sfx.node.off(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
     }
 
     onMusicChanged(toggle: Toggle) {
@@ -175,5 +170,9 @@ export class PopUpManager extends Component {
         }
     }
 
+    protected onDestroy(): void {
+        this.musicToggle.node.off(Toggle.EventType.TOGGLE, this.onMusicChanged, this);
+        this.sfx.node.off(Toggle.EventType.TOGGLE, this.onSfxChanged, this);
+    }
 }
 

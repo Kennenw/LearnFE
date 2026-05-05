@@ -245,8 +245,8 @@
     "__prefab": {
       "__id__": 11
     },
-    "speed": 10,
-    "damage": 2500,
+    "speed": 20,
+    "damage": 25,
     "_id": ""
   },
   {

@@ -1,6 +1,7 @@
-import { _decorator, Collider2D, Color, Component, instantiate, Label, Node, Prefab, ProgressBar, sp, Sprite, tween, v3, Vec3 } from 'cc';
+import { _decorator, Camera, Collider2D, Color, Component, instantiate, Label, Node, Prefab, ProgressBar, Sprite, tween, v3, Vec3 } from 'cc';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
+import { BULLET_TYPE } from '../Core/Constants/Bullet';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyController')
@@ -35,30 +36,44 @@ export class EnemyController extends Component {
     private _direction: Vec3 = new Vec3();
     private _attackCooldown: number = this.attackCooldown;
     private _isDeath: boolean = false;
-    private _maxHp: number = this.hp;
+    private _maxHp: number = 0;
     private _defaultColor: Color;
     private _defaultSpeed: number;
     private _defaultAttackCoolDown: number;
     private _slowColor: Color = new Color(46, 52, 179, 255);
     private _setSlowCoolDown: number = 2;
     private _slowCoolDown: number = this._setSlowCoolDown;
+    private _target: Node = null;
 
     protected onLoad(): void {
         this._defaultColor = this.sprite.color.clone();
         this._defaultSpeed = this.speed;
         this._defaultAttackCoolDown = this.attackCooldown;
+        this._maxHp = this.hp;
     }
 
     protected update(dt: number): void {
+        if (!this._target) {
+            return;
+        }
+        this.move(dt, this._target);
+
         this._slowCoolDown -= dt;
         if (this._slowCoolDown <= 0) {
             this.normal();
         }
     }
 
-    calculateDamage(damge: number) {
+    setTarget(target: Node) {
+        this._target = target;
+    }
+
+    calculateDamage(damge: number, bulletType: string) {
         this._updateProgressBar(damge);
         this._showDamage(damge);
+        if (bulletType === BULLET_TYPE.BULLET_ICE) {
+            this.slow();
+        }
     }
 
     move(dt: number, target: Node) {

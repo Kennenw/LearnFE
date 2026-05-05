@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Label, ProgressBar, Node, Color, tween, Vec3, color, Sprite } from 'cc';
+import { _decorator, Button, Component, Label, ProgressBar, Node } from 'cc';
 import { CharacterManager } from '../Managers/CharacterManager';
 import { EnemyManager } from '../Managers/EnemyManager';
 import { CharacterController } from './CharacterController';
@@ -6,7 +6,6 @@ import { GAME_EVENTS } from '../Core/Constants/GameEvents';
 import { emitter } from '../Core/Events/Emitter';
 import { WAVE_ROOM } from '../Core/Constants/Common';
 import { PopUpManager } from '../Managers/PopUpManager';
-import { ITEMS } from '../Core/Constants/Item';
 const { ccclass, property } = _decorator;
 
 @ccclass('RoomController')
@@ -44,7 +43,6 @@ export class RoomController extends Component {
     private _charactorManager: CharacterManager;
     private _enemyManager: EnemyManager;
     private _character: CharacterController;
-    private _onCharacterHit: (data: any) => void;
     private _onCalculatePoint: (data: any) => void;
     private _currentHp: number;
     private _currentScore: number = 0;
@@ -53,33 +51,30 @@ export class RoomController extends Component {
     private _waveTime: number = 0;
     private _listEnemy: string[] = ['Enemy01', 'Enemy02', 'Enemy03'];
     private _isWave: boolean = false;
+    private _onCharacterHP: (data: any) => void;
     private _isWin = false;
     currentWave: string = '';
     private _onButtonBulletType: (data: any) => void;
-    private _onPickUp: (data: any) => void;
 
     init() {
         this._popUp = PopUpManager.instance;
         this._charactorManager = this.node.getComponentInChildren(CharacterManager);
         this._enemyManager = this.node.getComponentInChildren(EnemyManager);
         this._character = this._charactorManager.getMainCharacter();
-        this._enemyManager._target = this._character.node;
         this.waves.forEach((wave) => {
             wave.string = WAVE_ROOM.WAVE_01;
-        })
-        this._currentHp = this._character.hp;
-
-        this._onCharacterHit = this.onCharacterHit.bind(this);
-        emitter.on(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
-        this._onCalculatePoint = this.onCalculatePoint.bind(this);
-        emitter.on(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
+        });
         this.totalEnemy.string = `${this.totalEnemy}`;
         this.score.string = `SCORE:  ${this._currentScore}`;
         this.currentWave = WAVE_ROOM.WAVE_01;
+
+        this._onCharacterHP = this.onCharacterHP.bind(this);
+        emitter.on(GAME_EVENTS.CALCULATE_HP_PLAYER, this._onCharacterHP);
+        this._onCalculatePoint = this.onCalculatePoint.bind(this);
+        emitter.on(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
         this._onButtonBulletType = this.onButtonBulletType.bind(this);
         emitter.on(GAME_EVENTS.CHOOSE_BULLET, this._onButtonBulletType);
-        this._onPickUp = this._picked.bind(this);
-        emitter.on(GAME_EVENTS.PICK_ITEM, this._onPickUp);
+        emitter.on(GAME_EVENTS.HEAL_CHARACTER, this._onCharacterHP);
     }
 
     protected start(): void {
@@ -124,21 +119,14 @@ export class RoomController extends Component {
         }
     }
 
-    protected onDestroy(): void {
-        emitter.off(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
-        emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
-        emitter.off(GAME_EVENTS.CHOOSE_BULLET, this._onButtonBulletType);
-        emitter.off(GAME_EVENTS.PICK_ITEM, this._onPickUp);
-    }
-
     onCalculatePoint(data: any) {
         this._totalEnemy--;
         this._currentScore += data.score;
         this.score.string = `SCORE:  ${this._currentScore}`;
     }
 
-    onCharacterHit(data: any) {
-        this._updateProgressBar(data.damage);
+    onCharacterHP(data: any) {
+        this._updateProgressBar(data.currentHP, data.maxHP);
         if (this.progressBar.progress <= 0) {
             this._character.death();
             this.scheduleOnce(() => {
@@ -150,23 +138,7 @@ export class RoomController extends Component {
     onQuit() {
         this.node.destroy();
     }
-
-    private _picked(data: any) {
-        switch (data.item.name) {
-            case ITEMS.ITEM_HP:
-
-                break;
-            case ITEMS.ITEM_DAMAGE:
-
-                break;
-            case ITEMS.ITEM_SPEED:
-
-                break;
-            default:
-                break;
-        }
-    }
-
+    
     private onButtonBulletType(data: any) {
         this.buttonBulletTypes.forEach((button) => {
             if (button.name === data.type) {
@@ -208,7 +180,8 @@ export class RoomController extends Component {
         const spawnFunction = () => {
             this._enemyManager.spawn(
                 this._character.node.worldPosition,
-                this._randomEnemy(wave)
+                this._randomEnemy(wave),
+                this._character.node
             );
 
             this._totalEnemy++;
@@ -247,14 +220,18 @@ export class RoomController extends Component {
             this.imagePopup.forEach((image) => {
                 image.active = false;
             });
-            this._enemyManager.spawn(this._character.node.worldPosition, this._listEnemy[2]);
+            this._enemyManager.spawn(
+                this._character.node.worldPosition,
+                this._listEnemy[2],
+                this._character.node);
             this._totalEnemy++;
         }, 4);
 
         const spawnFunction = () => {
             this._enemyManager.spawn(
                 this._character.node.worldPosition,
-                this._randomEnemy(2)
+                this._randomEnemy(2),
+                this._character.node
             );
 
             this._totalEnemy++;
@@ -269,9 +246,8 @@ export class RoomController extends Component {
         this.schedule(spawnFunction, 1, totalEnemy - 1, 1);
     }
 
-    private _updateProgressBar(damge: number) {
-        this._currentHp = Math.max(this._currentHp - damge, 0);
-        this.progressBar.progress = this._currentHp / this._character.hp;
+    private _updateProgressBar(currentHP: number, maxHP: number) {
+        this.progressBar.progress = currentHP / maxHP;
     }
 
     private _enableButton(isEnable: boolean = true) {
@@ -284,7 +260,7 @@ export class RoomController extends Component {
     }
 
     private _lose() {
-        emitter.off(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
+        emitter.off(GAME_EVENTS.CALCULATE_HP_PLAYER, this._onCharacterHP);
         emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
 
         this._enableButton(false);
@@ -293,7 +269,7 @@ export class RoomController extends Component {
 
     private _win() {
         if (this._totalEnemy <= 0 && !this._isWave) {
-            emitter.off(GAME_EVENTS.PLAYER_TAKE_DAMAGE, this._onCharacterHit);
+            emitter.off(GAME_EVENTS.CALCULATE_HP_PLAYER, this._onCharacterHP);
             emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
             this._enableButton(false);
             this._popUp.showWin(this._currentScore, Math.floor(this._waveTime));
@@ -304,6 +280,13 @@ export class RoomController extends Component {
     private _randomEnemy(types: number): string {
         const enemy = Math.floor(Math.random() * types);
         return this._listEnemy[enemy];
+    }
+
+    protected onDestroy(): void {
+        emitter.off(GAME_EVENTS.CALCULATE_SCORE, this._onCalculatePoint);
+        emitter.off(GAME_EVENTS.CHOOSE_BULLET, this._onButtonBulletType);
+        emitter.off(GAME_EVENTS.HEAL_CHARACTER, this._onCharacterHP);
+        emitter.off(GAME_EVENTS.CALCULATE_HP_PLAYER, this._onCharacterHP);
     }
 }
 

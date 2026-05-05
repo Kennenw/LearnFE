@@ -52,7 +52,7 @@ export class LoadingManager extends Component {
         const random = Math.floor(Math.random() * (total));
         this.backgrounds.forEach(background => {
             if (this.backgrounds[random] === background) {
-                background.active = true;
+                background.active = true; 
                 return;
             }
         });

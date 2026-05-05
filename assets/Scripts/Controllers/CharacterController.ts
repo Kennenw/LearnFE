@@ -1,4 +1,4 @@
-import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, director, Camera, view, Collider2D, Contact2DType } from 'cc';
+import { _decorator, Component, sp, Vec2, Node, Vec3, RigidBody2D, director, Camera, view, Collider2D, Contact2DType, Prefab, instantiate, v3, Label, tween } from 'cc';
 import { AnimationStateMachine } from '../Core/StateMachines/AnimationStateMachine';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
@@ -17,6 +17,9 @@ export class CharacterController extends Component {
     @property(Node)
     positionShoot: Node;
 
+    @property(Prefab)
+    healText: Prefab;
+
     id: string = '';
 
     private _animation: AnimationStateMachine;
@@ -25,6 +28,7 @@ export class CharacterController extends Component {
     private _limitMove: any;
     private _rigidBody2D: RigidBody2D;
     private _collider: Collider2D;
+    _currentHp: number;
 
     bulletType: string = BULLET_TYPE.BULLET_NORMAL;
 
@@ -33,6 +37,7 @@ export class CharacterController extends Component {
         this._collider = this.node.getComponent(Collider2D);
         this._limitMove = this._limitPosition();
         this._collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+        this._currentHp = this.hp;
     }
 
     protected start(): void {
@@ -45,8 +50,8 @@ export class CharacterController extends Component {
         this._clampPosition();
     }
 
-    protected onDestroy(): void {
-        this._collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    setBulletType(type: string) {
+        this.bulletType = type;
     }
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
@@ -56,6 +61,35 @@ export class CharacterController extends Component {
                 item: otherCollider.node
             });
         }
+    }
+
+    healHP(amount: number) {
+        this._currentHp = Math.min(this._currentHp + amount, this.hp);
+        this._showTextHeal(amount);
+    }
+
+    caculateDamage(damage: number) {
+        this._currentHp = Math.max(this._currentHp - damage, 0);
+        return {
+            maxHP: this.hp,
+            currentHP: this._currentHp
+        };
+    }
+
+    private _showTextHeal(amount: number) {
+        const node = instantiate(this.healText);
+        node.parent = this.node;
+        node.position.add(v3(0, 70, 0));
+        const label = node.getComponent(Label);
+        label.string = `+${amount}`;
+        tween(node)
+            .by(1, { position: v3(0, 50, 0) })
+            .call(() => {
+                if (node && node.isValid) {
+                    node.destroy();
+                }
+            })
+            .start();
     }
 
     shoot(keyDown: boolean = true) {
@@ -174,5 +208,9 @@ export class CharacterController extends Component {
             this.node.setWorldPosition(new Vec3(x, y, position.z));
             this._velocity.set(0, 0);
         }
+    }
+
+    protected onDestroy(): void {
+        this._collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
 }

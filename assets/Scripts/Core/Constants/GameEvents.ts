@@ -24,7 +24,10 @@ export const GAME_EVENTS = {
     ROOM_RESET: 'ROOM:RESET',
 
     DROPPED_ITEM: 'DROPPER:ITEM',
-    PICK_ITEM: 'PICK:ITEM'
+    PICK_ITEM: 'PICK:ITEM',
+    CALCULATE_HP_PLAYER: 'CALCULATE:HP:PLAYER',
+    BUFF_CHARACTER: 'BUFF:CHARACTER',
+    HEAL_CHARACTER: 'HEAL:CHARACTER',
 }
 
 export type Events = {
@@ -51,5 +54,8 @@ export type Events = {
 
     [GAME_EVENTS.DROPPED_ITEM]: { position: Vec3 },
     [GAME_EVENTS.PICK_ITEM]: { id: string, item: Node },
+    [GAME_EVENTS.CALCULATE_HP_PLAYER]: { maxHP: number, currentHP: number },
+    [GAME_EVENTS.BUFF_CHARACTER]: { type: string, amount: number },
+    [GAME_EVENTS.HEAL_CHARACTER]: { maxHP: number, currentHP: number },
 }
 

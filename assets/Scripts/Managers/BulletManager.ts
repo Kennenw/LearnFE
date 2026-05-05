@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, Prefab, Vec3 } from 'cc';
 import { BulletController } from '../Controllers/BulletController';
 import { emitter } from '../Core/Events/Emitter';
 import { GAME_EVENTS } from '../Core/Constants/GameEvents';
@@ -21,10 +21,6 @@ export class BulletManager extends Component {
         emitter.on(GAME_EVENTS.SHOOT, this._onSpawn);
     }
 
-    protected onDestroy(): void {
-        emitter.off(GAME_EVENTS.SHOOT, this._onSpawn);
-    }
-
     onSpwan(data: any) {
         const prefab = this._prefabs.get(data.bulletType);
         const node = instantiate(prefab);
@@ -32,9 +28,12 @@ export class BulletManager extends Component {
         const positionSpwan = this.node.inverseTransformPoint(new Vec3(), data.position);
         node.setPosition(positionSpwan);
         const controller = node.getComponent(BulletController);
-        controller.direction = data.direction;
-        controller.type = data.bulletType;
+        controller.init(data.direction, data.bulletType);
         this._bullet.set(node.uuid, controller);
+    }
+
+    protected onDestroy(): void {
+        emitter.off(GAME_EVENTS.SHOOT, this._onSpawn);
     }
 }
 

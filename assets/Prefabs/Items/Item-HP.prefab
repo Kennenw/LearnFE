@@ -215,6 +215,8 @@
     "__prefab": {
       "__id__": 11
     },
+    "nameItem": "Item-HP",
+    "value": 20,
     "_id": ""
   },
   {

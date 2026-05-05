@@ -32,8 +32,9 @@ export class BulletController extends Component {
         this.destruction();
     }
 
-    protected onDestroy(): void {
-        this._collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    init(direction: number, type: string) {
+        this.direction = direction;
+        this.type = type;
     }
 
     destruction() {
@@ -60,5 +61,8 @@ export class BulletController extends Component {
         );
     }
 
+    protected onDestroy(): void {
+        this._collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
 }
 
