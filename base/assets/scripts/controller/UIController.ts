@@ -1,6 +1,7 @@
-import { _decorator, Button, Component, Label, Node } from 'cc';
-import { GameEventManager } from './core/GameEventManager';
-import * as utils from "./utils/utils";
+import { _decorator, BlockInputEvents, Button, Component, Label, Node } from 'cc';
+import { GameEventManager } from '../core/GameEventManager';
+import * as utils from "../utils/utils";
+import { EventConstants } from '../constants/EventConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('UIController')
@@ -25,9 +26,16 @@ export class LoadGame extends Component {
     @property(Button)
     plusButton: Button = null;
 
+    @property(Button)
+    spineButton: Button = null;
+
+    @property(Node)
+    block: Node = null
+
 
     private _onLoadData: (data: any) => void;
     private _onUpdateBet: (data: any) => void;
+    private _onSpine: () => void;
     private _jackpots: Record<string, number> = {};
     private _betDenoms: Record<number, number> = {};
     private _bets: Record<number, number> = {};
@@ -35,17 +43,24 @@ export class LoadGame extends Component {
     private _jackpotIs: string[] = [];
     private _currentIndex: number = 0;
     private _wallet: number = 0;
+    private _isSpinning: boolean = false;
 
     onLoad(): void {
         this.eventManager = this.node.parent.getComponent(GameEventManager);
         this._onLoadData = this.loadData.bind(this);
         this._onUpdateBet = this.updateBet.bind(this);
+        this._onSpine = this.onSpine.bind(this);
     }
 
     onEnable(): void {
-        this.eventManager.on("JOIN_GAME_SUCCESS", this._onLoadData);
-        this.eventManager.on("MINUS_BUTTON_CLICK", this._onUpdateBet);
-        this.eventManager.on("PLUS_BUTTON_CLICK", this._onUpdateBet);
+        this.eventManager.on(EventConstants.JOIN_GAME_SUCCESS, this._onLoadData);
+        this.eventManager.on(EventConstants.MINUS_BUTTON_CLICK, this._onUpdateBet);
+        this.eventManager.on(EventConstants.PLUS_BUTTON_CLICK, this._onUpdateBet);
+        this.eventManager.on(EventConstants.SPIN_BUTTON_CLICK, this._onSpine);
+    }
+
+    protected update(dt: number): void {
+        this.spineButton.interactable = this.canSpine();
     }
 
     private loadData(data: any): void {
@@ -129,6 +144,29 @@ export class LoadGame extends Component {
 
         this.loadBet();
         this.loadJackpot();
+    }
+
+    private canSpine() {
+        if (this._wallet >= this._bets[this._betIds[this._currentIndex]] && !this._isSpinning) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private onSpine() {
+        this._isSpinning = true;
+        this.spineButton.interactable = false;
+        this.block.active = true;
+        const betId: string = this._betIds[this._currentIndex].toString();
+        this.eventManager.emit(EventConstants.SPIN_START, betId);
+    }
+
+    protected onDestroy(): void {
+        this.eventManager.off(EventConstants.JOIN_GAME_SUCCESS, this._onLoadData);
+        this.eventManager.off(EventConstants.MINUS_BUTTON_CLICK, this._onUpdateBet);
+        this.eventManager.off(EventConstants.PLUS_BUTTON_CLICK, this._onUpdateBet);
+        this.eventManager.off(EventConstants.SPIN_BUTTON_CLICK, this._onSpine);
     }
 }
 

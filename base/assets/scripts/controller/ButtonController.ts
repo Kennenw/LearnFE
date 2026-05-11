@@ -1,5 +1,6 @@
 import { _decorator, Component, Node } from 'cc';
-import { GameEventManager } from './core/GameEventManager';
+import { GameEventManager } from '../core/GameEventManager';
+import { EventConstants } from '../constants/EventConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('ButtonController')
@@ -11,12 +12,15 @@ export class ButtonController extends Component {
     }
 
     onMinusButtonClick(): void {
-        this.eventManager.emit("MINUS_BUTTON_CLICK", { value: -1 });
+        this.eventManager.emit(EventConstants.MINUS_BUTTON_CLICK, { value: -1 });
     }
 
     onPlusButtonClick(): void {
-        this.eventManager.emit("PLUS_BUTTON_CLICK", { value: 1 });
+        this.eventManager.emit(EventConstants.PLUS_BUTTON_CLICK, { value: 1 });
     }
 
+    onSpinButtonClick(): void {
+        this.eventManager.emit(EventConstants.SPIN_BUTTON_CLICK);
+    }
 }
 
