@@ -2,7 +2,7 @@ import { _decorator, Component, Graphics, instantiate, Node, Prefab } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('ReelController')
-export class ShreedController extends Component {
+export class ReelController extends Component {
     @property([Prefab])
     symbolPrefabs: Prefab[] = [];
 
@@ -14,14 +14,12 @@ export class ShreedController extends Component {
 
     init() {
         for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 24; j++) {
-                const symbolIndex = Math.floor(Math.random() * this.symbolPrefabs.length);
-                const symbolPrefab = this.symbolPrefabs[symbolIndex];
-                const symbolNode = instantiate(symbolPrefab);
-                symbolNode.setPosition(0, 0, 0);
-                this.node.addChild(symbolNode);
-                this._reelMatrix.push(symbolIndex);
-            }
+            const symbolIndex = Math.floor(Math.random() * this.symbolPrefabs.length);
+            const symbolPrefab = this.symbolPrefabs[symbolIndex];
+            const symbolNode = instantiate(symbolPrefab);
+            symbolNode.setPosition(0, 0, 0);
+            this.node.addChild(symbolNode);
+            this._reelMatrix.push(symbolIndex);
         }
     }
 
