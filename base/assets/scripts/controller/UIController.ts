@@ -88,14 +88,18 @@ export class LoadGame extends Component {
         this.minusButton.interactable = false;
     }
 
-    private loadWallet(): void {
+    private loadWallet(onComplete?: () => void): void {
         utils.tweenMoney(this.walletLabel,
             0.5,
             this._wallet,
             {
                 acceptRunDown: true,
             },
-            (value) => '$' + utils.formatMoney(value));
+            (value) => '$' + utils.formatMoney(value))
+            .call(() => {
+                onComplete?.();
+            })
+            .start();
     }
 
     private loadBet(): void {
@@ -167,10 +171,12 @@ export class LoadGame extends Component {
     }
 
     private onUpdateWallet(winAmount: number) {
-        this.setSpinState(false);
-        this.block.active = false;
         this._wallet += winAmount;
-        this.loadWallet();
+
+        this.loadWallet(() => {
+            this.block.active = false;
+            this.setSpinState(false);
+        });
     }
 
     private onSpin() {
