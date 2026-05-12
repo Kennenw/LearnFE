@@ -79,7 +79,7 @@ export class ReelController extends Component {
         }
 
         tween(this.node)
-            .by(0.75, {
+            .by(0.3, {
                 position: new Vec3(0, -this.SYMBOL_SPACING_Y, 0)
             }, {
                 easing: 'quadIn'

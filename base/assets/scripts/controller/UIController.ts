@@ -82,9 +82,11 @@ export class LoadGame extends Component {
             this._jackpotIs.push(key);
         });
 
-        this.loadWallet();
         this.loadBet();
         this.loadJackpot();
+        this.loadWallet(() => {
+            this.block.active = false;
+        });
         this.minusButton.interactable = false;
     }
 
