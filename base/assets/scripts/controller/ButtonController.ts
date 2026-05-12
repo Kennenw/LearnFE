@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component } from 'cc';
 import { GameEventManager } from '../core/GameEventManager';
 import { EventConstants } from '../constants/EventConstants';
 const { ccclass, property } = _decorator;
@@ -21,6 +21,10 @@ export class ButtonController extends Component {
 
     onSpinButtonClick(): void {
         this.eventManager.emit(EventConstants.SPIN_BUTTON_CLICK);
+    }
+
+    onStopSpinButtonClick(): void {
+        this.eventManager.emit(EventConstants.SPIN_STOP_BUTTON_CLICK);
     }
 }
 
